@@ -1,0 +1,19 @@
+{
+  "name": "oneclickapps",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom CapRover one-click app repository for Supabase",
+  "scripts": {
+    "formatter": "prettier --check './public/**/*.(json|yml)'",
+    "formatter-write": "prettier --write './public/**/*.(json|yml)'",
+    "build": "rm -rf ./dist/ && mkdir -p dist && node ./scripts/build_one_click_apps.js && node ./scripts/build_one_click_apps_from_v4.js",
+    "generate_supabase": "node ./scripts/generate_supabase.js",
+    "validate_apps": "node ./scripts/validate_apps.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^9.0.1",
+    "prettier": "^2.0.5",
+    "yaml": "^1.10.0"
+  }
+}
