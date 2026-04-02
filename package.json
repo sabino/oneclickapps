@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^9.0.1",
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.1.1",
     "prettier": "^2.0.5",
     "yaml": "^1.10.0"
   }

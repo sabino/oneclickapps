@@ -1,6 +1,8 @@
 /*jshint esversion: 6 */
 const path = require('path');
 const fs = require('fs-extra');
+const MarkdownIt = require('markdown-it');
+const hljs = require('highlight.js');
 
 const pathOfDocs = path.join(__dirname, '..', 'docs');
 const pathOfDist = path.join(__dirname, '..', 'dist');
@@ -26,116 +28,31 @@ function titleFromSlug(slug) {
         .join(' ');
 }
 
-function renderInlineMarkdown(text) {
-    return escapeHtml(text)
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>');
-}
-
 function renderMarkdown(markdown) {
-    const lines = markdown.replace(/\r\n/g, '\n').split('\n');
-    const html = [];
-    let paragraph = [];
-    let listType = null;
-    let inCodeBlock = false;
-    let codeLines = [];
+    const md = new MarkdownIt({
+        html: false,
+        linkify: true,
+        typographer: false,
+    });
 
-    function flushParagraph() {
-        if (!paragraph.length) {
-            return;
-        }
-        html.push(`<p>${paragraph.join(' ')}</p>`);
-        paragraph = [];
-    }
+    md.renderer.rules.fence = (tokens, idx) => {
+        const token = tokens[idx];
+        const normalizedLanguage = `${token.info || ''}`.trim().toLowerCase().split(/\s+/)[0];
+        const code = token.content;
+        let highlighted = '';
+        let languageClass = '';
 
-    function flushList() {
-        if (!listType) {
-            return;
-        }
-        html.push(`</${listType}>`);
-        listType = null;
-    }
-
-    function flushCodeBlock() {
-        if (!inCodeBlock) {
-            return;
-        }
-        html.push(
-            `<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre></div>`
-        );
-        inCodeBlock = false;
-        codeLines = [];
-    }
-
-    for (const rawLine of lines) {
-        const trimmed = rawLine.trim();
-
-        if (rawLine.startsWith('```')) {
-            flushParagraph();
-            flushList();
-            if (inCodeBlock) {
-                flushCodeBlock();
-            } else {
-                inCodeBlock = true;
-                codeLines = [];
-            }
-            continue;
+        if (normalizedLanguage && hljs.getLanguage(normalizedLanguage)) {
+            highlighted = hljs.highlight(code, { language: normalizedLanguage }).value;
+            languageClass = ` language-${normalizedLanguage}`;
+        } else {
+            highlighted = hljs.highlightAuto(code, ['bash', 'json', 'yaml', 'javascript', 'typescript', 'shell']).value;
         }
 
-        if (inCodeBlock) {
-            codeLines.push(rawLine);
-            continue;
-        }
+        return `<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs${languageClass}">${highlighted}</code></pre></div>`;
+    };
 
-        if (!trimmed) {
-            flushParagraph();
-            flushList();
-            continue;
-        }
-
-        const heading = trimmed.match(/^(#{1,3})\s+(.*)$/);
-        if (heading) {
-            flushParagraph();
-            flushList();
-            const level = heading[1].length;
-            html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`);
-            continue;
-        }
-
-        const ordered = trimmed.match(/^(\d+)\.\s+(.*)$/);
-        if (ordered) {
-            flushParagraph();
-            if (listType !== 'ol') {
-                flushList();
-                listType = 'ol';
-                html.push('<ol>');
-            }
-            html.push(`<li>${renderInlineMarkdown(ordered[2])}</li>`);
-            continue;
-        }
-
-        const bullet = trimmed.match(/^-\s+(.*)$/);
-        if (bullet) {
-            flushParagraph();
-            if (listType !== 'ul') {
-                flushList();
-                listType = 'ul';
-                html.push('<ul>');
-            }
-            html.push(`<li>${renderInlineMarkdown(bullet[1])}</li>`);
-            continue;
-        }
-
-        flushList();
-        paragraph.push(renderInlineMarkdown(trimmed));
-    }
-
-    flushParagraph();
-    flushList();
-    flushCodeBlock();
-
-    return html.join('\n');
+    return md.render(markdown);
 }
 
 function parseDoc(pathOfFile) {
@@ -358,36 +275,87 @@ function layoutCss() {
       .content-inner ol {
         padding-left: 24px;
       }
+      .content-inner :not(pre) > code {
+        display: inline-block;
+        padding: 0.18rem 0.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: rgba(22, 196, 127, 0.08);
+        color: #b7f7db;
+        font-size: 0.92em;
+        line-height: 1.4;
+      }
       .content-inner pre {
         margin: 0 0 16px;
-        overflow: auto;
+        overflow: hidden;
         padding: 52px 16px 16px;
         border-radius: 14px;
-        background: #0d1521;
-        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #101a28 0%, #0d1521 100%);
+        border: 1px solid rgba(148, 163, 184, 0.14);
         color: var(--text);
-        scrollbar-width: thin;
-        scrollbar-color: rgba(148, 163, 184, 0.36) transparent;
-      }
-      .content-inner pre::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-      }
-      .content-inner pre::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .content-inner pre::-webkit-scrollbar-thumb {
-        background: rgba(148, 163, 184, 0.28);
-        border-radius: 999px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
       }
       .content-inner pre code {
         display: block;
         white-space: pre-wrap;
+        word-break: break-word;
         overflow-wrap: anywhere;
+        line-height: 1.7;
+      }
+      .content-inner .hljs {
+        color: #e6eef8;
+        background: transparent;
+      }
+      .content-inner .hljs-comment,
+      .content-inner .hljs-quote {
+        color: #7f90a8;
+      }
+      .content-inner .hljs-keyword,
+      .content-inner .hljs-selector-tag,
+      .content-inner .hljs-literal,
+      .content-inner .hljs-section,
+      .content-inner .hljs-link {
+        color: #7dd3fc;
+      }
+      .content-inner .hljs-string,
+      .content-inner .hljs-attr,
+      .content-inner .hljs-regexp {
+        color: #86efac;
+      }
+      .content-inner .hljs-number,
+      .content-inner .hljs-symbol,
+      .content-inner .hljs-bullet,
+      .content-inner .hljs-built_in {
+        color: #fbbf24;
+      }
+      .content-inner .hljs-title,
+      .content-inner .hljs-function,
+      .content-inner .hljs-name,
+      .content-inner .hljs-title.function_ {
+        color: #c4b5fd;
+      }
+      .content-inner .hljs-variable,
+      .content-inner .hljs-template-variable,
+      .content-inner .hljs-meta,
+      .content-inner .hljs-type,
+      .content-inner .hljs-params {
+        color: #f9a8d4;
       }
       .code-block {
         position: relative;
         margin-bottom: 16px;
+      }
+      .code-block::before {
+        content: '';
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #ef4444;
+        box-shadow: 16px 0 0 #f59e0b, 32px 0 0 #22c55e;
+        opacity: 0.9;
       }
       .copy-code-button {
         position: absolute;
