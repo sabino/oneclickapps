@@ -8,6 +8,7 @@
       name="description"
       content="Custom CapRover one-click apps published by Sabino."
     />
+    <link rel="icon" type="image/svg+xml" href="assets/caprover-green.svg" />
     <style>
       :root {
         --page-bg: #0b1017;
@@ -80,16 +81,20 @@
       }
 
       .brand-mark {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 10px;
         display: inline-grid;
         place-items: center;
         background: linear-gradient(135deg, var(--accent-soft), rgba(255, 255, 255, 0.02) 85%);
         border: 1px solid var(--border);
-        color: var(--accent);
-        font-size: 0.95rem;
-        font-weight: 800;
+        padding: 7px;
+      }
+
+      .brand-mark img {
+        width: 100%;
+        height: 100%;
+        display: block;
       }
 
       .header-links {
@@ -193,8 +198,9 @@
       .repo-field code {
         flex: 1 1 auto;
         min-width: 0;
-        overflow-wrap: anywhere;
-        word-break: normal;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         line-height: 1.35;
         color: var(--text);
         font-size: 0.9rem;
@@ -417,10 +423,55 @@
       }
 
       .guide-frame {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        background: var(--surface);
+        overflow: auto;
+        padding: 22px 22px 28px;
+      }
+
+      .guide-content {
+        color: var(--muted);
+        line-height: 1.72;
+      }
+
+      .guide-content h1,
+      .guide-content h2,
+      .guide-content h3 {
+        color: var(--text);
+        letter-spacing: -0.03em;
+      }
+
+      .guide-content h1 {
+        font-size: 1.7rem;
+        margin: 0 0 16px;
+      }
+
+      .guide-content h2 {
+        font-size: 1.12rem;
+        margin: 24px 0 12px;
+      }
+
+      .guide-content h3 {
+        font-size: 1rem;
+        margin: 20px 0 10px;
+      }
+
+      .guide-content p,
+      .guide-content ul,
+      .guide-content ol {
+        margin: 0 0 14px;
+      }
+
+      .guide-content ul,
+      .guide-content ol {
+        padding-left: 22px;
+      }
+
+      .guide-content code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        color: var(--text);
+      }
+
+      .guide-loading {
+        color: var(--muted);
       }
 
       footer {
@@ -467,7 +518,7 @@
     <header>
       <div class="container navbar">
         <a class="brand" id="brand-link" href="/">
-          <span class="brand-mark">S</span>
+          <span class="brand-mark"><img src="assets/caprover-green.svg" alt="" /></span>
           <span>Sabino One-Click Apps</span>
         </a>
 
@@ -537,7 +588,9 @@
           <h2 class="guide-modal-title">CapRover guide</h2>
           <button id="guide-close" class="guide-modal-close" type="button">Close</button>
         </div>
-        <iframe id="guide-frame" class="guide-frame" title="CapRover guide"></iframe>
+        <div id="guide-frame" class="guide-frame">
+          <div class="guide-loading">Loading guide…</div>
+        </div>
       </div>
     </dialog>
 
@@ -582,7 +635,7 @@
     </template>
 
     <script>
-      const state = { apps: [], filteredApps: [] };
+      const state = { apps: [], filteredApps: [], guideCache: new Map() };
       const basePath = (() => {
         const path = window.location.pathname;
         return path.endsWith('/') ? path : `${path.slice(0, path.lastIndexOf('/') + 1)}`;
@@ -592,6 +645,89 @@
       function withBasePath(path) {
         if (/^https?:\/\//i.test(path)) return path;
         return new URL(path.replace(/^\//, ''), `${window.location.origin}${basePath}`).toString();
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function renderMarkdown(markdown) {
+        const lines = markdown.replace(/\r\n/g, '\n').split('\n');
+        const html = [];
+        let paragraph = [];
+        let listType = null;
+
+        function flushParagraph() {
+          if (!paragraph.length) return;
+          html.push(`<p>${paragraph.join(' ')}</p>`);
+          paragraph = [];
+        }
+
+        function flushList() {
+          if (!listType) return;
+          html.push(`</${listType}>`);
+          listType = null;
+        }
+
+        function inlineFormat(text) {
+          return escapeHtml(text).replace(/`([^`]+)`/g, '<code>$1</code>');
+        }
+
+        for (const rawLine of lines) {
+          const line = rawLine.trim();
+
+          if (!line) {
+            flushParagraph();
+            flushList();
+            continue;
+          }
+
+          const heading = line.match(/^(#{1,3})\s+(.*)$/);
+          if (heading) {
+            flushParagraph();
+            flushList();
+            const level = heading[1].length;
+            html.push(`<h${level}>${inlineFormat(heading[2])}</h${level}>`);
+            continue;
+          }
+
+          const ordered = line.match(/^(\d+)\.\s+(.*)$/);
+          if (ordered) {
+            flushParagraph();
+            if (listType !== 'ol') {
+              flushList();
+              listType = 'ol';
+              html.push('<ol>');
+            }
+            html.push(`<li>${inlineFormat(ordered[2])}</li>`);
+            continue;
+          }
+
+          const bullet = line.match(/^-\s+(.*)$/);
+          if (bullet) {
+            flushParagraph();
+            if (listType !== 'ul') {
+              flushList();
+              listType = 'ul';
+              html.push('<ul>');
+            }
+            html.push(`<li>${inlineFormat(bullet[1])}</li>`);
+            continue;
+          }
+
+          flushList();
+          paragraph.push(inlineFormat(line));
+        }
+
+        flushParagraph();
+        flushList();
+
+        return html.join('');
       }
 
       const els = {
@@ -654,18 +790,36 @@
         }
       }
 
-      function openGuide(url) {
-        els.guideFrame.src = url;
+      async function openGuide(url, title) {
+        els.guideFrame.innerHTML = '<div class="guide-loading">Loading guide…</div>';
+        if (title) {
+          document.querySelector('.guide-modal-title').textContent = title;
+        }
         if (typeof els.guideModal.showModal === 'function') {
           els.guideModal.showModal();
-        } else {
-          window.location.href = url;
+        }
+
+        try {
+          let markdown = state.guideCache.get(url);
+          if (!markdown) {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`Failed to load guide: ${response.status}`);
+            }
+            markdown = await response.text();
+            state.guideCache.set(url, markdown);
+          }
+          els.guideFrame.innerHTML = `<div class="guide-content">${renderMarkdown(markdown)}</div>`;
+        } catch (error) {
+          console.error(error);
+          els.guideFrame.innerHTML =
+            '<div class="guide-loading">Failed to load guide. Please try again.</div>';
         }
       }
 
       function closeGuide() {
         els.guideModal.close();
-        els.guideFrame.src = 'about:blank';
+        els.guideFrame.innerHTML = '<div class="guide-loading">Loading guide…</div>';
       }
 
       function buildCategoryOptions(apps) {
@@ -750,7 +904,7 @@
               return;
             }
             event.preventDefault();
-            openGuide(guideLink.href);
+            openGuide(guideLink.href, `${app.displayName} guide`);
           });
 
           const tags = root.querySelector('.tags');
