@@ -6,74 +6,516 @@
     <title>oneclickapps.sabino.pro</title>
     <style>
       :root {
-        color-scheme: light dark;
+        color-scheme: dark;
+        --bg: #020617;
+        --bg-soft: rgba(15, 23, 42, 0.78);
+        --panel: rgba(15, 23, 42, 0.92);
+        --panel-border: rgba(148, 163, 184, 0.18);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.14);
+        --good: #10b981;
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0f172a;
-        color: #e2e8f0;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+        color: var(--text);
         background:
           radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 30%),
           linear-gradient(180deg, #020617, #0f172a 65%);
       }
 
+      a {
+        color: inherit;
+      }
+
       main {
-        width: min(760px, calc(100vw - 32px));
+        width: min(1200px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 48px 0 80px;
+      }
+
+      .hero {
         padding: 32px;
-        border-radius: 20px;
-        background: rgba(15, 23, 42, 0.86);
-        box-shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
-        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.78));
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 28px 80px rgba(2, 6, 23, 0.45);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        color: #bae6fd;
+        background: rgba(12, 74, 110, 0.38);
+        border: 1px solid rgba(56, 189, 248, 0.18);
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 4vw, 3rem);
+        margin: 16px 0 12px;
+        font-size: clamp(2.4rem, 6vw, 4.4rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
       }
 
-      p {
-        line-height: 1.6;
+      .hero p {
+        margin: 0;
+        max-width: 760px;
+        line-height: 1.65;
         color: #cbd5e1;
+        font-size: 1.02rem;
       }
 
-      code,
-      a {
+      .hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .hero-links a {
+        text-decoration: none;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        background: rgba(15, 23, 42, 0.72);
+      }
+
+      .hero-links code {
         color: #7dd3fc;
       }
 
-      .card {
-        margin-top: 24px;
-        padding: 20px;
-        border-radius: 16px;
-        background: rgba(15, 23, 42, 0.72);
-        border: 1px solid rgba(125, 211, 252, 0.2);
+      .filters {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.8fr) minmax(160px, 0.9fr);
+        gap: 16px;
+        margin: 28px 0 20px;
       }
 
-      ul {
-        margin: 12px 0 0 20px;
+      .filters input,
+      .filters select {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: rgba(15, 23, 42, 0.88);
+        color: var(--text);
+        border-radius: 14px;
+        padding: 14px 16px;
+        font: inherit;
+      }
+
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .stat {
+        padding: 10px 14px;
+        border-radius: 14px;
+        background: var(--bg-soft);
+        border: 1px solid var(--panel-border);
+        color: var(--muted);
+      }
+
+      .catalog {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+        border-radius: 22px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 18px 48px rgba(2, 6, 23, 0.32);
+      }
+
+      .card-top {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .card-top img {
+        width: 54px;
+        height: 54px;
+        object-fit: contain;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 8px;
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .slug {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .description {
+        margin: 0;
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .meta {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.68);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .meta-label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+      }
+
+      .meta-value {
+        font-weight: 600;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .tag {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: #bae6fd;
+        font-size: 0.82rem;
+        border: 1px solid rgba(56, 189, 248, 0.18);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .actions a {
+        text-decoration: none;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .actions a.primary {
+        background: linear-gradient(180deg, rgba(14, 165, 233, 0.24), rgba(2, 132, 199, 0.18));
+        border-color: rgba(56, 189, 248, 0.3);
+      }
+
+      .empty {
+        padding: 28px;
+        border-radius: 20px;
+        border: 1px dashed rgba(148, 163, 184, 0.25);
+        color: var(--muted);
+      }
+
+      .status {
+        margin-top: 16px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
+        main {
+          width: min(100vw - 20px, 1200px);
+          padding-top: 20px;
+        }
+
+        .hero,
+        .card {
+          padding: 20px;
+        }
+
+        .filters {
+          grid-template-columns: 1fr;
+        }
+
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>oneclickapps.sabino.pro</h1>
-      <p>
-        Custom CapRover one-click app catalog currently publishing the full self-hosted Supabase stack.
-      </p>
+      <section class="hero">
+        <span class="eyebrow">Custom CapRover One-Click Repository</span>
+        <h1>oneclickapps.sabino.pro</h1>
+        <p>
+          Searchable GitHub Pages catalog for custom CapRover one-click apps. CapRover consumes the
+          published catalog endpoints directly, while this page gives a human-friendly view of what is
+          available to deploy.
+        </p>
 
-      <div class="card">
-        <p><strong>Use this repository in CapRover:</strong></p>
-        <ul>
-          <li>Add <code>https://oneclickapps.sabino.pro</code> as a custom one-click app repository.</li>
-          <li>The CapRover catalog endpoint is available at <a href="/v4/list">/v4/list</a>.</li>
-          <li>The published app template is available at <a href="/v4/apps/supabase">/v4/apps/supabase</a>.</li>
-        </ul>
-      </div>
+        <div class="hero-links">
+          <a href="/v4/list">Catalog endpoint: <code>/v4/list</code></a>
+          <a href="/v4/apps/supabase">Supabase template JSON</a>
+          <a href="https://github.com/sabino/oneclickapps">GitHub repository</a>
+        </div>
+      </section>
+
+      <section class="filters" aria-label="Catalog filters">
+        <input id="search" type="search" placeholder="Search apps, tags, descriptions..." />
+        <select id="category">
+          <option value="all">All categories</option>
+        </select>
+      </section>
+
+      <section class="stats" aria-label="Catalog stats">
+        <div class="stat"><strong id="total-count">0</strong> app(s) published</div>
+        <div class="stat"><strong id="visible-count">0</strong> currently visible</div>
+      </section>
+
+      <section id="catalog" class="catalog" aria-live="polite"></section>
+      <p id="status" class="status">Loading catalog...</p>
     </main>
+
+    <template id="app-card-template">
+      <article class="card">
+        <div class="card-top">
+          <img alt="" />
+          <div>
+            <h2></h2>
+            <div class="slug"></div>
+          </div>
+        </div>
+
+        <p class="description"></p>
+
+        <div class="meta-grid">
+          <div class="meta">
+            <span class="meta-label">Category</span>
+            <span class="meta-value category-value"></span>
+          </div>
+          <div class="meta">
+            <span class="meta-label">Services</span>
+            <span class="meta-value services-value"></span>
+          </div>
+          <div class="meta">
+            <span class="meta-label">Variables</span>
+            <span class="meta-value variables-value"></span>
+          </div>
+          <div class="meta">
+            <span class="meta-label">Public app</span>
+            <span class="meta-value public-service-value"></span>
+          </div>
+        </div>
+
+        <div class="tags"></div>
+
+        <div class="actions">
+          <a class="primary template-link" target="_blank" rel="noreferrer">Open template JSON</a>
+          <a class="docs-link" target="_blank" rel="noreferrer">Documentation</a>
+        </div>
+      </article>
+    </template>
+
+    <script>
+      const state = {
+        apps: [],
+        filteredApps: [],
+      };
+
+      const els = {
+        search: document.getElementById('search'),
+        category: document.getElementById('category'),
+        catalog: document.getElementById('catalog'),
+        totalCount: document.getElementById('total-count'),
+        visibleCount: document.getElementById('visible-count'),
+        status: document.getElementById('status'),
+        cardTemplate: document.getElementById('app-card-template'),
+      };
+
+      async function fetchJson(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        }
+
+        return response.json();
+      }
+
+      function buildCategoryOptions(apps) {
+        const categories = Array.from(
+          new Set(
+            apps
+              .map((app) => app.category)
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b))
+          )
+        );
+
+        els.category.innerHTML = '<option value="all">All categories</option>';
+        for (const category of categories) {
+          const option = document.createElement('option');
+          option.value = category;
+          option.textContent = category;
+          els.category.appendChild(option);
+        }
+      }
+
+      function filterApps() {
+        const query = els.search.value.trim().toLowerCase();
+        const category = els.category.value;
+
+        state.filteredApps = state.apps.filter((app) => {
+          const haystack = [
+            app.name,
+            app.displayName,
+            app.description,
+            app.category,
+            ...(app.tags || []),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+          const matchesQuery = !query || haystack.includes(query);
+          const matchesCategory = category === 'all' || app.category === category;
+          return matchesQuery && matchesCategory;
+        });
+
+        renderApps();
+      }
+
+      function createTag(label) {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = label;
+        return tag;
+      }
+
+      function renderApps() {
+        els.catalog.innerHTML = '';
+        els.totalCount.textContent = String(state.apps.length);
+        els.visibleCount.textContent = String(state.filteredApps.length);
+
+        if (!state.filteredApps.length) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'No apps match the current filters.';
+          els.catalog.appendChild(empty);
+          els.status.textContent = 'Catalog loaded.';
+          return;
+        }
+
+        for (const app of state.filteredApps) {
+          const fragment = els.cardTemplate.content.cloneNode(true);
+          const card = fragment.querySelector('.card');
+          const image = card.querySelector('img');
+          const title = card.querySelector('h2');
+          const slug = card.querySelector('.slug');
+          const description = card.querySelector('.description');
+          const category = card.querySelector('.category-value');
+          const services = card.querySelector('.services-value');
+          const variables = card.querySelector('.variables-value');
+          const publicService = card.querySelector('.public-service-value');
+          const tags = card.querySelector('.tags');
+          const templateLink = card.querySelector('.template-link');
+          const docsLink = card.querySelector('.docs-link');
+
+          image.src = app.logoUrl;
+          image.alt = `${app.displayName} logo`;
+          title.textContent = app.displayName;
+          slug.textContent = app.name;
+          description.textContent = app.description;
+          category.textContent = app.category || 'Uncategorized';
+          services.textContent = String(app.serviceCount ?? '—');
+          variables.textContent = String(app.variableCount ?? '—');
+          publicService.textContent = app.publicService || '—';
+          templateLink.href = app.templateUrl;
+          docsLink.href = app.documentation || app.templateUrl;
+          docsLink.textContent = app.documentation ? 'Documentation' : 'Template details';
+
+          for (const tag of app.tags || []) {
+            tags.appendChild(createTag(tag));
+          }
+
+          if (app.isOfficial) {
+            tags.appendChild(createTag('Official-style metadata'));
+          }
+
+          els.catalog.appendChild(fragment);
+        }
+
+        els.status.textContent = 'Catalog loaded.';
+      }
+
+      async function loadCatalog() {
+        try {
+          const [listData, metadata] = await Promise.all([
+            fetchJson('/v4/list'),
+            fetchJson('/catalog-metadata.json').catch(() => ({})),
+          ]);
+
+          const apps = await Promise.all(
+            (listData.oneClickApps || []).map(async (summary) => {
+              const detail = await fetchJson(`/v4/apps/${summary.name}`);
+              const meta = metadata[summary.name] || {};
+              const services = detail.services || {};
+              const variables = detail.caproverOneClickApp?.variables || [];
+              const publicService = Object.entries(services).find(
+                ([, config]) => config.caproverExtra?.notExposeAsWebApp !== 'true'
+              )?.[0];
+
+              return {
+                ...summary,
+                ...meta,
+                logoUrl: meta.logoUrl || `/v4/logos/${summary.logoUrl}`,
+                templateUrl: `/v4/apps/${summary.name}`,
+                documentation: meta.documentation || detail.caproverOneClickApp?.documentation || '',
+                serviceCount: Object.keys(services).length,
+                variableCount: variables.length,
+                publicService: publicService ? publicService.replace('$$cap_appname', summary.name) : '',
+              };
+            })
+          );
+
+          state.apps = apps.sort((a, b) => a.displayName.localeCompare(b.displayName));
+          buildCategoryOptions(state.apps);
+          filterApps();
+        } catch (error) {
+          console.error(error);
+          els.status.textContent = `Failed to load catalog: ${error.message}`;
+        }
+      }
+
+      els.search.addEventListener('input', filterApps);
+      els.category.addEventListener('change', filterApps);
+
+      loadCatalog();
+    </script>
   </body>
 </html>
