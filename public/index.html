@@ -191,9 +191,13 @@
       }
 
       .repo-field code {
-        word-break: break-all;
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        line-height: 1.35;
         color: var(--text);
-        font-size: 0.94rem;
+        font-size: 0.9rem;
       }
 
       .copy-button {
@@ -365,6 +369,60 @@
         background: var(--surface);
       }
 
+      .guide-modal {
+        width: min(1080px, calc(100vw - 24px));
+        height: min(82vh, 860px);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 0;
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--shadow);
+      }
+
+      .guide-modal::backdrop {
+        background: rgba(2, 6, 23, 0.78);
+        backdrop-filter: blur(6px);
+      }
+
+      .guide-modal-shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        height: 100%;
+      }
+
+      .guide-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .guide-modal-title {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: -0.02em;
+      }
+
+      .guide-modal-close {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .guide-frame {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: var(--surface);
+      }
+
       footer {
         border-top: 1px solid var(--border);
         color: var(--muted-soft);
@@ -473,6 +531,16 @@
       <div class="container">Built for CapRover third-party repositories.</div>
     </footer>
 
+    <dialog id="guide-modal" class="guide-modal">
+      <div class="guide-modal-shell">
+        <div class="guide-modal-header">
+          <h2 class="guide-modal-title">CapRover guide</h2>
+          <button id="guide-close" class="guide-modal-close" type="button">Close</button>
+        </div>
+        <iframe id="guide-frame" class="guide-frame" title="CapRover guide"></iframe>
+      </div>
+    </dialog>
+
     <template id="app-card-template">
       <article class="panel card">
         <div class="card-top">
@@ -507,7 +575,7 @@
 
         <div class="actions">
           <a class="official-link" target="_blank" rel="noreferrer">Official docs</a>
-          <a class="guide-link" target="_blank" rel="noreferrer">CapRover guide</a>
+          <a class="guide-link" rel="noreferrer">CapRover guide</a>
           <a class="source-link" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </article>
@@ -539,6 +607,9 @@
         copyStatus: document.getElementById('copy-status'),
         repoUrl: document.getElementById('repo-url'),
         repoUrlInline: Array.from(document.querySelectorAll('.repo-url-inline')),
+        guideModal: document.getElementById('guide-modal'),
+        guideFrame: document.getElementById('guide-frame'),
+        guideClose: document.getElementById('guide-close'),
       };
 
       async function fetchJson(url) {
@@ -581,6 +652,20 @@
             els.copyStatus.textContent = 'Copy failed. Select the URL and copy it manually.';
           }
         }
+      }
+
+      function openGuide(url) {
+        els.guideFrame.src = url;
+        if (typeof els.guideModal.showModal === 'function') {
+          els.guideModal.showModal();
+        } else {
+          window.location.href = url;
+        }
+      }
+
+      function closeGuide() {
+        els.guideModal.close();
+        els.guideFrame.src = 'about:blank';
       }
 
       function buildCategoryOptions(apps) {
@@ -658,7 +743,15 @@
           }
 
           const sourceLink = root.querySelector('.source-link');
-          sourceLink.href = 'https://github.com/sabino/oneclickapps';
+          sourceLink.href = app.source || 'https://github.com/sabino/oneclickapps';
+
+          guideLink.addEventListener('click', (event) => {
+            if (!app.caproverGuide) {
+              return;
+            }
+            event.preventDefault();
+            openGuide(guideLink.href);
+          });
 
           const tags = root.querySelector('.tags');
           for (const tag of app.tags || []) {
@@ -720,6 +813,12 @@
       els.search.addEventListener('input', filterApps);
       els.category.addEventListener('change', filterApps);
       els.copyRepo.addEventListener('click', copyRepositoryUrl);
+      els.guideClose.addEventListener('click', closeGuide);
+      els.guideModal.addEventListener('click', (event) => {
+        if (event.target === els.guideModal) {
+          closeGuide();
+        }
+      });
       loadCatalog();
     </script>
   </body>

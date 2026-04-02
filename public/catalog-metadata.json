@@ -11,6 +11,7 @@
             "analytics"
         ],
         "documentation": "https://supabase.com/docs/guides/self-hosting/docker",
-        "caproverGuide": "/apps/supabase/"
+        "caproverGuide": "/apps/supabase/",
+        "source": "https://github.com/sabino/oneclickapps/tree/main/public/v4/apps"
     }
 }
