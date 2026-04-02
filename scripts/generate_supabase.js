@@ -23,6 +23,7 @@ const OVERLAY_CAPACITY_DOCS = "https://oneclickapps.sabino.pro/docs/increase-ove
 const BOOL_REGEX = "/^(true|false)$/";
 const NUMBER_REGEX = "/^\\d+$/";
 const IMAGE_TAG_REGEX = "/^([^\\s^\\/])+$/";
+const DEFAULT_PUBLIC_URL = "https://$$cap_appname.$$cap_root_domain";
 
 function readAsset(relativePath) {
   return fs.readFileSync(path.join(assetsRoot, relativePath), "utf8").replace(/\r\n/g, "\n");
@@ -382,7 +383,7 @@ const allServices = {
       AZURE_OPENAI_USE_API_KEY_HEADER: "$$cap_azure_openai_use_api_key_header",
       JWT_SECRET: "$$cap_jwt_secret",
       SUPABASE_URL: "http://srv-captain--$$cap_appname:8000",
-      SUPABASE_PUBLIC_URL: "$$cap_public_url",
+      SUPABASE_PUBLIC_URL: DEFAULT_PUBLIC_URL,
       SUPABASE_ANON_KEY: "$$cap_anon_key",
       SUPABASE_SERVICE_KEY: "$$cap_service_role_key",
       AUTH_JWT_SECRET: "$$cap_jwt_secret",
@@ -434,11 +435,11 @@ const allServices = {
     environment: {
       GOTRUE_API_HOST: "0.0.0.0",
       GOTRUE_API_PORT: "9999",
-      API_EXTERNAL_URL: "$$cap_public_url",
+      API_EXTERNAL_URL: DEFAULT_PUBLIC_URL,
       GOTRUE_DB_DRIVER: "postgres",
       GOTRUE_DB_DATABASE_URL:
         `postgres://supabase_auth_admin:$$cap_postgres_password@srv-captain--$$cap_appname-db:${internalPostgresPort}/$$cap_postgres_db`,
-      GOTRUE_SITE_URL: "$$cap_site_url",
+      GOTRUE_SITE_URL: DEFAULT_PUBLIC_URL,
       GOTRUE_URI_ALLOW_LIST: "$$cap_additional_redirect_urls",
       GOTRUE_DISABLE_SIGNUP: "$$cap_disable_signup",
       GOTRUE_JWT_ADMIN_ROLES: "service_role",
@@ -530,7 +531,7 @@ const allServices = {
       AUTH_JWT_SECRET: "$$cap_jwt_secret",
       DATABASE_URL:
         `postgres://supabase_storage_admin:$$cap_postgres_password@srv-captain--$$cap_appname-db:${internalPostgresPort}/$$cap_postgres_db`,
-      STORAGE_PUBLIC_URL: "$$cap_public_url",
+      STORAGE_PUBLIC_URL: DEFAULT_PUBLIC_URL,
       REQUEST_ALLOW_X_FORWARDED_PATH: "true",
       FILE_SIZE_LIMIT: "$$cap_storage_file_size_limit",
       STORAGE_BACKEND: "file",
@@ -590,7 +591,7 @@ const allServices = {
     environment: {
       JWT_SECRET: "$$cap_jwt_secret",
       SUPABASE_URL: "http://srv-captain--$$cap_appname:8000",
-      SUPABASE_PUBLIC_URL: "$$cap_public_url",
+      SUPABASE_PUBLIC_URL: DEFAULT_PUBLIC_URL,
       SUPABASE_ANON_KEY: "$$cap_anon_key",
       SUPABASE_SERVICE_ROLE_KEY: "$$cap_service_role_key",
       SUPABASE_PUBLISHABLE_KEYS: "{\"default\":\"$$cap_publishable_key\"}",
@@ -722,14 +723,6 @@ const imageVersionVariables = [
 ];
 
 const routingVariables = [
-  variable("$$cap_public_url", "Public Supabase URL", "https://$$cap_appname.$$cap_root_domain", {
-    description: "The public URL users will use for Studio, REST, Auth, Storage, and Realtime through Kong.",
-    validRegex: "/^https?:\\/\\/.+$/",
-  }),
-  variable("$$cap_site_url", "Default Auth Site URL", "https://$$cap_appname.$$cap_root_domain", {
-    description: "Default redirect base for Auth.",
-    validRegex: "/^https?:\\/\\/.+$/",
-  }),
   variable("$$cap_additional_redirect_urls", "Additional redirect URLs", "", {
     description: "Comma-separated or blank.",
   }),
