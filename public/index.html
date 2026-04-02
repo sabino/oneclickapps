@@ -523,6 +523,7 @@
         </a>
 
         <nav class="header-links" aria-label="External links">
+          <a id="docs-link" href="docs/">Docs</a>
           <a href="https://github.com/sabino/oneclickapps">GitHub</a>
           <a href="https://caprover.com/">CapRover</a>
         </nav>
@@ -732,6 +733,7 @@
 
       const els = {
         brandLink: document.getElementById('brand-link'),
+        docsLink: document.getElementById('docs-link'),
         search: document.getElementById('search'),
         category: document.getElementById('category'),
         catalog: document.getElementById('catalog'),
@@ -920,6 +922,7 @@
       async function loadCatalog() {
         try {
           els.brandLink.href = withBasePath('');
+          els.docsLink.href = withBasePath('docs/');
           els.repoUrl.textContent = repositoryUrl;
           for (const node of els.repoUrlInline) {
             node.textContent = repositoryUrl;

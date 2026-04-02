@@ -1,6 +1,6 @@
-# Supabase on CapRover: shared overlay network capacity
+# Increase overlay network capacity
 
-The current Supabase templates are large enough that they can expose a pre-existing CapRover swarm networking problem on busy hosts: the shared `captain-overlay-network` can run out of VIP/IP allocations.
+Busy CapRover hosts can eventually run into a shared swarm networking problem: the global `captain-overlay-network` runs out of VIP/IP allocations.
 
 ## Symptoms
 
@@ -13,7 +13,7 @@ On the Docker host, `docker service ps ...` or daemon logs may show:
 - `could not find an available IP while allocating VIP`
 - `service ... has pending allocations`
 
-This is not a Supabase-specific runtime bug. It means the shared overlay network CapRover uses for service-to-service traffic does not have enough free addresses.
+This is not tied to one specific app. It means the shared overlay network CapRover uses for service-to-service traffic does not have enough free addresses.
 
 ## Why this happens
 
@@ -139,4 +139,4 @@ Then verify the core CapRover services are healthy again:
 docker service ls --format '{{.Name}} {{.Replicas}}' | grep 'captain-'
 ```
 
-And finally retry the Supabase one-click install.
+And finally retry the deployment that was failing.
