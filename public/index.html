@@ -2,40 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>One Click Apps</title>
+    <title>Sabino One-Click Apps</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Searchable GitHub Pages catalog for custom CapRover one-click apps published by Sabino."
+      content="Custom CapRover one-click apps published by Sabino."
     />
     <style>
       :root {
-        --page-bg: #ffffff;
-        --surface: #ffffff;
-        --surface-soft: #f8fafc;
-        --text: #0f172a;
-        --muted: #475569;
-        --muted-soft: #64748b;
-        --border: #e2e8f0;
-        --accent: #13a96a;
-        --accent-soft: #dcfae6;
-        --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        --page-bg: #0b1017;
+        --surface: #121926;
+        --surface-soft: #1a2231;
+        --text: #ecf3fb;
+        --muted: #b2c0d1;
+        --muted-soft: #7f90a8;
+        --border: rgba(148, 163, 184, 0.18);
+        --accent: #16c47f;
+        --accent-soft: rgba(22, 196, 127, 0.16);
+        --shadow: 0 18px 48px rgba(2, 6, 23, 0.35);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --page-bg: #0b1220;
-          --surface: #111827;
-          --surface-soft: #0f172a;
-          --text: #e5e7eb;
-          --muted: #cbd5e1;
-          --muted-soft: #94a3b8;
-          --border: rgba(148, 163, 184, 0.2);
-          --accent: #32d583;
-          --accent-soft: rgba(50, 213, 131, 0.18);
-          --shadow: 0 18px 48px rgba(2, 6, 23, 0.35);
-        }
       }
 
       * {
@@ -64,8 +49,12 @@
       }
 
       header {
-        background: var(--surface);
+        background: rgba(11, 16, 23, 0.92);
         border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
 
       .container {
@@ -96,7 +85,7 @@
         border-radius: 10px;
         display: inline-grid;
         place-items: center;
-        background: linear-gradient(135deg, var(--accent-soft), transparent 85%);
+        background: linear-gradient(135deg, var(--accent-soft), rgba(255, 255, 255, 0.02) 85%);
         border: 1px solid var(--border);
         color: var(--accent);
         font-size: 0.95rem;
@@ -116,7 +105,7 @@
       }
 
       main {
-        padding: 32px 0 72px;
+        padding: 24px 0 64px;
       }
 
       .content {
@@ -126,7 +115,7 @@
 
       .hero {
         display: grid;
-        gap: 14px;
+        gap: 10px;
       }
 
       .eyebrow {
@@ -139,24 +128,21 @@
 
       h1 {
         margin: 0;
-        font-size: clamp(2.3rem, 5vw, 3.6rem);
-        line-height: 1.02;
-        letter-spacing: -0.04em;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
       }
 
       .hero p {
         margin: 0;
-        max-width: 820px;
+        max-width: 860px;
         color: var(--muted);
-        line-height: 1.7;
-        font-size: 1.02rem;
+        line-height: 1.65;
+        font-size: 0.98rem;
       }
 
-      .intro-grid {
-        display: grid;
-        grid-template-columns: 1.9fr 1fr;
-        gap: 20px;
-        align-items: start;
+      .setup {
+        overflow: hidden;
       }
 
       .panel {
@@ -170,6 +156,13 @@
         padding: 22px;
       }
 
+      .setup-grid {
+        display: grid;
+        grid-template-columns: 1.6fr minmax(280px, 0.9fr);
+        gap: 20px;
+        align-items: center;
+      }
+
       .summary-list {
         margin: 0;
         padding-left: 18px;
@@ -179,6 +172,43 @@
 
       .summary-list li + li {
         margin-top: 4px;
+      }
+
+      .repo-box {
+        display: grid;
+        gap: 12px;
+      }
+
+      .repo-field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--surface-soft);
+      }
+
+      .repo-field code {
+        word-break: break-all;
+        color: var(--text);
+        font-size: 0.94rem;
+      }
+
+      .copy-button {
+        border: 1px solid rgba(22, 196, 127, 0.35);
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 12px;
+        padding: 10px 14px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .copy-button:hover {
+        filter: brightness(1.06);
       }
 
       .toolbar {
@@ -191,7 +221,7 @@
       .toolbar select {
         width: 100%;
         border: 1px solid var(--border);
-        background: var(--surface);
+        background: var(--surface-soft);
         color: var(--text);
         border-radius: 12px;
         padding: 14px 16px;
@@ -242,7 +272,7 @@
         height: 52px;
         object-fit: contain;
         padding: 8px;
-        background: var(--surface-soft);
+        background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--border);
         border-radius: 14px;
       }
@@ -284,7 +314,7 @@
       .meta {
         padding: 14px;
         border-radius: 14px;
-        background: var(--surface-soft);
+        background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--border);
       }
 
@@ -312,7 +342,7 @@
         border-radius: 999px;
         border: 1px solid var(--border);
         color: var(--muted);
-        background: var(--surface-soft);
+        background: rgba(255, 255, 255, 0.02);
         font-size: 0.84rem;
       }
 
@@ -346,7 +376,7 @@
       }
 
       @media (max-width: 900px) {
-        .intro-grid,
+        .setup-grid,
         .toolbar,
         .meta-grid {
           grid-template-columns: 1fr;
@@ -379,13 +409,12 @@
     <header>
       <div class="container navbar">
         <a class="brand" href="/">
-          <span class="brand-mark">OC</span>
-          <span>One Click Apps</span>
+          <span class="brand-mark">S</span>
+          <span>Sabino One-Click Apps</span>
         </a>
 
         <nav class="header-links" aria-label="External links">
           <a href="https://github.com/sabino/oneclickapps">GitHub</a>
-          <a href="https://github.com/caprover/one-click-apps">CapRover upstream</a>
         </nav>
       </div>
     </header>
@@ -393,18 +422,18 @@
     <main class="container">
       <div class="content">
         <section class="hero">
-          <div class="eyebrow">Custom Repository</div>
-          <h1>One Click Apps</h1>
+          <div class="eyebrow">3rd Party Repository</div>
+          <h1>Apps</h1>
           <p>
-            Custom CapRover one-click apps published as a third-party repository. Browse what is available
-            here, then add this repository inside CapRover to install the apps directly from the dashboard.
+            Supabase is a complex app and requires custom file generation. For a more updated and maintained
+            version, add this repository to your CapRover one-click apps and install it from there.
           </p>
         </section>
 
-        <section class="intro-grid">
-          <article class="panel">
-            <div class="panel-inner">
-              <h2>Add this repository in CapRover</h2>
+        <section class="panel setup">
+          <div class="panel-inner setup-grid">
+            <div>
+              <h2 style="margin-top: 0">Use in CapRover</h2>
               <ol class="summary-list">
                 <li>Open <strong>Apps</strong> in CapRover.</li>
                 <li>Open <strong>One Click Apps</strong>.</li>
@@ -412,19 +441,14 @@
                 <li>Paste <code>https://oneclickapps.sabino.pro</code> and click <strong>Connect New Repository</strong>.</li>
               </ol>
             </div>
-          </article>
-
-          <aside class="panel">
-            <div class="panel-inner">
-              <h2>Repository URL</h2>
-              <p class="description" style="margin: 0 0 12px">
-                Use this exact address when adding the repository in CapRover.
-              </p>
-              <div class="meta">
-                <span class="meta-value">https://oneclickapps.sabino.pro</span>
+            <div class="repo-box">
+              <div class="repo-field">
+                <code id="repo-url">https://oneclickapps.sabino.pro</code>
+                <button id="copy-repo" class="copy-button" type="button">Copy</button>
               </div>
+              <p class="status" id="copy-status">Use this exact repository URL in CapRover.</p>
             </div>
-          </aside>
+          </div>
         </section>
 
         <section class="toolbar" aria-label="Catalog filters">
@@ -445,7 +469,7 @@
     </main>
 
     <footer>
-      <div class="container">Developed by Sabino Software</div>
+      <div class="container">Built for CapRover third-party repositories.</div>
     </footer>
 
     <template id="app-card-template">
@@ -498,6 +522,9 @@
         visibleCount: document.getElementById('visible-count'),
         status: document.getElementById('status'),
         cardTemplate: document.getElementById('app-card-template'),
+        copyRepo: document.getElementById('copy-repo'),
+        copyStatus: document.getElementById('copy-status'),
+        repoUrl: document.getElementById('repo-url'),
       };
 
       async function fetchJson(url) {
@@ -506,6 +533,16 @@
           throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
         return response.json();
+      }
+
+      async function copyRepositoryUrl() {
+        try {
+          await navigator.clipboard.writeText(els.repoUrl.textContent.trim());
+          els.copyStatus.textContent = 'Repository URL copied.';
+        } catch (error) {
+          console.error(error);
+          els.copyStatus.textContent = 'Copy failed. Select the URL and copy it manually.';
+        }
       }
 
       function buildCategoryOptions(apps) {
@@ -557,7 +594,7 @@
           empty.className = 'empty';
           empty.textContent = 'No apps match the current filters.';
           els.catalog.appendChild(empty);
-          els.status.textContent = 'Catalog loaded.';
+          els.status.textContent = '';
           return;
         }
 
@@ -590,8 +627,7 @@
 
           els.catalog.appendChild(fragment);
         }
-
-        els.status.textContent = 'Catalog loaded.';
+        els.status.textContent = '';
       }
 
       async function loadCatalog() {
@@ -635,6 +671,7 @@
 
       els.search.addEventListener('input', filterApps);
       els.category.addEventListener('change', filterApps);
+      els.copyRepo.addEventListener('click', copyRepositoryUrl);
       loadCatalog();
     </script>
   </body>
