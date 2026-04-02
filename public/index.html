@@ -34,10 +34,13 @@
         padding: 0;
         background: var(--page-bg);
         color: var(--text);
+        min-height: 100%;
       }
 
       body {
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
 
       a {
@@ -111,6 +114,7 @@
 
       main {
         padding: 24px 0 64px;
+        flex: 1 0 auto;
       }
 
       .content {
@@ -478,6 +482,8 @@
         border-top: 1px solid var(--border);
         color: var(--muted-soft);
         background: var(--surface);
+        margin-top: auto;
+        flex-shrink: 0;
       }
 
       footer .container {

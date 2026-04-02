@@ -200,6 +200,12 @@ function layoutCss() {
         padding: 0;
         background: var(--page-bg);
         color: var(--text);
+        min-height: 100%;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       a { color: var(--accent); text-decoration: none; }
       a:hover { text-decoration: underline; }
@@ -260,6 +266,7 @@ function layoutCss() {
       }
       main {
         padding: 28px 0 64px;
+        flex: 1 0 auto;
       }
       .eyebrow {
         color: var(--muted-soft);
@@ -413,6 +420,8 @@ function layoutCss() {
         border-top: 1px solid var(--border);
         color: var(--muted-soft);
         background: var(--surface);
+        margin-top: auto;
+        flex-shrink: 0;
       }
       footer .container { padding: 20px 0; }
       @media (max-width: 720px) {
