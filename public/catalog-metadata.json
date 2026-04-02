@@ -10,8 +10,6 @@
             "edge-functions",
             "analytics"
         ],
-        "documentation": "https://supabase.com/docs/guides/self-hosting/docker",
-        "caproverGuide": "/apps/supabase/guide.md",
-        "source": "https://github.com/sabino/oneclickapps/tree/main/public/apps/supabase"
+        "documentation": "https://supabase.com/docs/guides/self-hosting/docker"
     }
 }

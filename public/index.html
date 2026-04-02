@@ -585,7 +585,7 @@
     <dialog id="guide-modal" class="guide-modal">
       <div class="guide-modal-shell">
         <div class="guide-modal-header">
-          <h2 class="guide-modal-title">CapRover guide</h2>
+          <h2 class="guide-modal-title">Guide</h2>
           <button id="guide-close" class="guide-modal-close" type="button">Close</button>
         </div>
         <div id="guide-frame" class="guide-frame">
@@ -628,7 +628,7 @@
 
         <div class="actions">
           <a class="official-link" target="_blank" rel="noreferrer">Official docs</a>
-          <a class="guide-link" rel="noreferrer">CapRover guide</a>
+          <a class="guide-link" rel="noreferrer">Guide</a>
           <a class="source-link" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </article>
@@ -891,16 +891,13 @@
           const guideLink = root.querySelector('.guide-link');
           officialLink.href = app.documentation || app.templateUrl;
           officialLink.textContent = app.documentation ? 'Official docs' : 'Template details';
-          guideLink.href = app.caproverGuide ? withBasePath(app.caproverGuide.replace(/^\//, '')) : app.templateUrl;
-          if (!app.caproverGuide) {
-            guideLink.textContent = 'Template details';
-          }
+          guideLink.href = app.guideUrl || '';
 
           const sourceLink = root.querySelector('.source-link');
-          sourceLink.href = app.source || 'https://github.com/sabino/oneclickapps';
+          sourceLink.href = app.sourceUrl;
 
           guideLink.addEventListener('click', (event) => {
-            if (!app.caproverGuide) {
+            if (!app.guideUrl) {
               return;
             }
             event.preventDefault();
@@ -911,8 +908,8 @@
           for (const tag of app.tags || []) {
             tags.appendChild(createTag(tag));
           }
-          if (app.isOfficial) {
-            tags.appendChild(createTag('Official-style metadata'));
+          if (!app.guideUrl) {
+            guideLink.remove();
           }
 
           els.catalog.appendChild(fragment);
@@ -934,7 +931,7 @@
 
           const apps = await Promise.all(
             (listData.oneClickApps || []).map(async (summary) => {
-              const detail = await fetchJson(`/v4/apps/${summary.name}`);
+              const detail = await fetchJson(withBasePath(`v4/apps/${summary.name}`));
               const meta = metadata[summary.name] || {};
               const services = detail.services || {};
               const variables = detail.caproverOneClickApp?.variables || [];
@@ -948,6 +945,8 @@
                 templateUrl: withBasePath(`v4/apps/${summary.name}`),
                 logoUrl: meta.logoUrl ? withBasePath(meta.logoUrl) : withBasePath(`v4/logos/${summary.logoUrl}`),
                 documentation: meta.documentation || detail.caproverOneClickApp?.documentation || '',
+                guideUrl: meta.guide === false ? '' : withBasePath(`apps/${summary.name}/guide.md`),
+                sourceUrl: meta.source || `https://github.com/sabino/oneclickapps/blob/main/public/v4/apps/${summary.name}.yml`,
                 serviceCount: Object.keys(services).length,
                 variableCount: variables.length,
                 publicService: publicService ? publicService.replace('$$cap_appname', summary.name) : '',
