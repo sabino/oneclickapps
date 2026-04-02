@@ -414,6 +414,9 @@ services:
     restart: "unless-stopped"
     depends_on:
       - "$$cap_appname-db"
+    ports:
+      - "$$cap_postgres_session_port:5432"
+      - "$$cap_postgres_transaction_port:6543"
     environment:
       PORT: "4000"
       POSTGRES_PORT: "5432"
@@ -517,6 +520,16 @@ caproverOneClickApp:
       label: "Postgres password"
       defaultValue: "$$cap_gen_random_hex(32)"
       validRegex: "/.{1,}/"
+    - id: "$$cap_postgres_session_port"
+      label: "Supavisor session mode port"
+      defaultValue: ""
+      description: "Required unique host port for direct public/session-mode pooler access. Choose an unused port on this CapRover host."
+      validRegex: "/^\\d+$/"
+    - id: "$$cap_postgres_transaction_port"
+      label: "Supavisor transaction mode port"
+      defaultValue: ""
+      description: "Required unique host port for direct public/transaction-mode pooler access. Choose an unused port on this CapRover host."
+      validRegex: "/^\\d+$/"
     - id: "$$cap_jwt_secret"
       label: "JWT secret"
       defaultValue: "$$cap_gen_random_hex(64)"
@@ -720,7 +733,7 @@ caproverOneClickApp:
       validRegex: "/^(true|false)$/"
   instructions:
     start: "Deploys the current full Supabase self-host Docker stack on CapRover using baked-in upstream config assets. Most fields already have safe defaults; in the common case you only need the app name and can leave the advanced overrides alone.\n\nIf deployment fails with `No NodeId was found` or Docker logs mention `could not find an available IP while allocating VIP`, your shared CapRover swarm overlay is out of addresses. Remove unused services or follow the `/24 -> /20` migration guide in this repo before retrying."
-    end: "Supabase is deployed behind Kong at https://$$cap_appname.$$cap_root_domain by default. Studio, Auth, REST, Storage, Realtime, Functions, Postgres, Supavisor, and Analytics are included. Review the generated secrets, set a custom domain if needed, and test Studio plus the core APIs after deploy.\n\nSupavisor runs as an internal service by default so multiple Supabase installs can coexist on the same CapRover host. If you need direct external pooler access, publish custom ports manually after install.\n\nAfter deploy, enable HTTPS/TLS on the `$$cap_appname` service in CapRover. Kong is the public Supabase gateway and should be the service behind your domain and certificate."
+    end: "Supabase is deployed behind Kong at https://$$cap_appname.$$cap_root_domain by default. Studio, Auth, REST, Storage, Realtime, Functions, Postgres, Supavisor, and Analytics are included. Review the generated secrets, set a custom domain if needed, and test Studio plus the core APIs after deploy.\n\nSupavisor publishes the two host ports you selected for direct external pooler access. When installing more than one Supabase stack on the same host, these ports must be unique per install.\n\nAfter deploy, enable HTTPS/TLS on the `$$cap_appname` service in CapRover. Kong is the public Supabase gateway and should be the service behind your domain and certificate."
   displayName: "Supabase"
   isOfficial: true
   description: "Full self-hosted Supabase stack for CapRover, updated to the current Docker-based deployment layout."
