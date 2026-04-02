@@ -1,0 +1,15 @@
+{
+    "supabase": {
+        "category": "Database Platform",
+        "tags": [
+            "supabase",
+            "postgres",
+            "studio",
+            "auth",
+            "realtime",
+            "edge-functions",
+            "analytics"
+        ],
+        "documentation": "https://supabase.com/docs/guides/self-hosting/docker"
+    }
+}

@@ -2,136 +2,219 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>oneclickapps.sabino.pro</title>
+    <title>oneclickapps.sabino.pro | Custom CapRover Apps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Searchable GitHub Pages catalog for custom CapRover one-click apps published by Sabino."
+    />
     <style>
       :root {
-        color-scheme: dark;
-        --bg: #020617;
-        --bg-soft: rgba(15, 23, 42, 0.78);
-        --panel: rgba(15, 23, 42, 0.92);
-        --panel-border: rgba(148, 163, 184, 0.18);
-        --text: #e2e8f0;
-        --muted: #94a3b8;
-        --accent: #38bdf8;
-        --accent-soft: rgba(56, 189, 248, 0.14);
-        --good: #10b981;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --page-bg: #ffffff;
+        --surface: #ffffff;
+        --surface-soft: #f8fafc;
+        --text: #0f172a;
+        --muted: #475569;
+        --muted-soft: #64748b;
+        --border: #e2e8f0;
+        --accent: #2563eb;
+        --accent-soft: #dbeafe;
+        --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --page-bg: #0b1220;
+          --surface: #111827;
+          --surface-soft: #0f172a;
+          --text: #e5e7eb;
+          --muted: #cbd5e1;
+          --muted-soft: #94a3b8;
+          --border: rgba(148, 163, 184, 0.2);
+          --accent: #60a5fa;
+          --accent-soft: rgba(96, 165, 250, 0.16);
+          --shadow: 0 18px 48px rgba(2, 6, 23, 0.35);
+        }
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html,
       body {
         margin: 0;
-        min-height: 100vh;
+        padding: 0;
+        background: var(--page-bg);
         color: var(--text);
-        background:
-          radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 30%),
-          linear-gradient(180deg, #020617, #0f172a 65%);
+      }
+
+      body {
+        min-height: 100vh;
       }
 
       a {
-        color: inherit;
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .container {
+        width: min(1180px, calc(100vw - 32px));
+        margin: 0 auto;
+      }
+
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 72px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--accent-soft), transparent 85%);
+        border: 1px solid var(--border);
+        color: var(--accent);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .header-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .header-links a {
+        color: var(--muted);
+        font-size: 0.95rem;
       }
 
       main {
-        width: min(1200px, calc(100vw - 32px));
-        margin: 0 auto;
-        padding: 48px 0 80px;
+        padding: 32px 0 72px;
+      }
+
+      .content {
+        display: grid;
+        gap: 24px;
       }
 
       .hero {
-        padding: 32px;
-        border-radius: 24px;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.78));
-        border: 1px solid var(--panel-border);
-        box-shadow: 0 28px 80px rgba(2, 6, 23, 0.45);
+        display: grid;
+        gap: 14px;
       }
 
       .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.82rem;
-        color: #bae6fd;
-        background: rgba(12, 74, 110, 0.38);
-        border: 1px solid rgba(56, 189, 248, 0.18);
+        color: var(--muted-soft);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
       }
 
       h1 {
-        margin: 16px 0 12px;
-        font-size: clamp(2.4rem, 6vw, 4.4rem);
-        line-height: 0.95;
+        margin: 0;
+        font-size: clamp(2.3rem, 5vw, 3.6rem);
+        line-height: 1.02;
         letter-spacing: -0.04em;
       }
 
       .hero p {
         margin: 0;
-        max-width: 760px;
-        line-height: 1.65;
-        color: #cbd5e1;
+        max-width: 820px;
+        color: var(--muted);
+        line-height: 1.7;
         font-size: 1.02rem;
       }
 
-      .hero-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 24px;
-      }
-
-      .hero-links a {
-        text-decoration: none;
-        padding: 12px 16px;
-        border-radius: 14px;
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        background: rgba(15, 23, 42, 0.72);
-      }
-
-      .hero-links code {
-        color: #7dd3fc;
-      }
-
-      .filters {
+      .intro-grid {
         display: grid;
-        grid-template-columns: minmax(220px, 1.8fr) minmax(160px, 0.9fr);
-        gap: 16px;
-        margin: 28px 0 20px;
+        grid-template-columns: 1.9fr 1fr;
+        gap: 20px;
+        align-items: start;
       }
 
-      .filters input,
-      .filters select {
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel-inner {
+        padding: 22px;
+      }
+
+      .summary-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .summary-list li + li {
+        margin-top: 4px;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: minmax(260px, 1.6fr) minmax(180px, 0.85fr);
+        gap: 14px;
+      }
+
+      .toolbar input,
+      .toolbar select {
         width: 100%;
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid var(--border);
+        background: var(--surface);
         color: var(--text);
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 14px 16px;
         font: inherit;
       }
 
       .stats {
         display: flex;
+        gap: 14px;
         flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 22px;
       }
 
       .stat {
         padding: 10px 14px;
-        border-radius: 14px;
-        background: var(--bg-soft);
-        border: 1px solid var(--panel-border);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
         color: var(--muted);
+        font-size: 0.94rem;
       }
 
       .catalog {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 18px;
       }
 
@@ -139,62 +222,79 @@
         display: grid;
         gap: 16px;
         padding: 22px;
-        border-radius: 22px;
-        background: var(--panel);
-        border: 1px solid var(--panel-border);
-        box-shadow: 0 18px 48px rgba(2, 6, 23, 0.32);
       }
 
       .card-top {
         display: flex;
-        gap: 16px;
         align-items: center;
+        justify-content: space-between;
+        gap: 20px;
       }
 
-      .card-top img {
-        width: 54px;
-        height: 54px;
+      .card-heading {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .card-heading img {
+        width: 52px;
+        height: 52px;
         object-fit: contain;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.04);
         padding: 8px;
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        border-radius: 14px;
       }
 
-      .card h2 {
+      .card-heading h2 {
         margin: 0;
-        font-size: 1.2rem;
+        font-size: 1.24rem;
+        letter-spacing: -0.02em;
       }
 
       .slug {
         margin-top: 4px;
-        color: var(--muted);
+        color: var(--muted-soft);
+        font-size: 0.92rem;
+      }
+
+      .service-pill {
+        white-space: nowrap;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
         font-size: 0.9rem;
+        font-weight: 600;
       }
 
       .description {
         margin: 0;
-        color: #cbd5e1;
-        line-height: 1.6;
+        color: var(--muted);
+        line-height: 1.7;
       }
 
       .meta-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
       }
 
       .meta {
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: rgba(15, 23, 42, 0.68);
-        border: 1px solid rgba(148, 163, 184, 0.12);
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
       }
 
       .meta-label {
         display: block;
-        color: var(--muted);
+        color: var(--muted-soft);
         font-size: 0.8rem;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
       }
 
       .meta-value {
@@ -210,106 +310,154 @@
       .tag {
         padding: 8px 10px;
         border-radius: 999px;
-        background: var(--accent-soft);
-        color: #bae6fd;
-        font-size: 0.82rem;
-        border: 1px solid rgba(56, 189, 248, 0.18);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--surface-soft);
+        font-size: 0.84rem;
       }
 
       .actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-      }
-
-      .actions a {
-        text-decoration: none;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: rgba(15, 23, 42, 0.72);
-        border: 1px solid rgba(148, 163, 184, 0.16);
-      }
-
-      .actions a.primary {
-        background: linear-gradient(180deg, rgba(14, 165, 233, 0.24), rgba(2, 132, 199, 0.18));
-        border-color: rgba(56, 189, 248, 0.3);
-      }
-
-      .empty {
-        padding: 28px;
-        border-radius: 20px;
-        border: 1px dashed rgba(148, 163, 184, 0.25);
-        color: var(--muted);
+        gap: 16px;
       }
 
       .status {
-        margin-top: 16px;
+        margin: 0;
+        color: var(--muted-soft);
+      }
+
+      .empty {
+        padding: 24px;
+        border: 1px dashed var(--border);
+        border-radius: 16px;
         color: var(--muted);
+        background: var(--surface);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        color: var(--muted-soft);
+        background: var(--surface);
+      }
+
+      footer .container {
+        padding: 20px 0;
+      }
+
+      @media (max-width: 900px) {
+        .intro-grid,
+        .toolbar,
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .card-top {
+          align-items: flex-start;
+          flex-direction: column;
+        }
       }
 
       @media (max-width: 720px) {
-        main {
-          width: min(100vw - 20px, 1200px);
-          padding-top: 20px;
+        .container {
+          width: min(100vw - 20px, 1180px);
         }
 
-        .hero,
-        .card {
-          padding: 20px;
+        .navbar {
+          padding: 12px 0;
+          align-items: flex-start;
+          flex-direction: column;
         }
 
-        .filters {
-          grid-template-columns: 1fr;
-        }
-
-        .meta-grid {
-          grid-template-columns: 1fr;
+        .header-links {
+          gap: 12px;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <section class="hero">
-        <span class="eyebrow">Custom CapRover One-Click Repository</span>
-        <h1>oneclickapps.sabino.pro</h1>
-        <p>
-          Searchable GitHub Pages catalog for custom CapRover one-click apps. CapRover consumes the
-          published catalog endpoints directly, while this page gives a human-friendly view of what is
-          available to deploy.
-        </p>
+    <header>
+      <div class="container navbar">
+        <a class="brand" href="/">
+          <span class="brand-mark">OC</span>
+          <span>oneclickapps.sabino.pro</span>
+        </a>
 
-        <div class="hero-links">
-          <a href="/v4/list">Catalog endpoint: <code>/v4/list</code></a>
-          <a href="/v4/apps/supabase">Supabase template JSON</a>
-          <a href="https://github.com/sabino/oneclickapps">GitHub repository</a>
-        </div>
-      </section>
+        <nav class="header-links" aria-label="External links">
+          <a href="/v4/list">Catalog JSON</a>
+          <a href="https://github.com/sabino/oneclickapps">GitHub</a>
+          <a href="https://github.com/caprover/one-click-apps">CapRover upstream</a>
+        </nav>
+      </div>
+    </header>
 
-      <section class="filters" aria-label="Catalog filters">
-        <input id="search" type="search" placeholder="Search apps, tags, descriptions..." />
-        <select id="category">
-          <option value="all">All categories</option>
-        </select>
-      </section>
+    <main class="container">
+      <div class="content">
+        <section class="hero">
+          <div class="eyebrow">Custom One-Click Catalog</div>
+          <h1>Deployable apps, published as a standalone CapRover catalog.</h1>
+          <p>
+            This site is a human-friendly index over the same static JSON endpoints that CapRover uses.
+            Browse available apps, inspect their metadata, and copy the repository URL into CapRover when
+            you want to install them.
+          </p>
+        </section>
 
-      <section class="stats" aria-label="Catalog stats">
-        <div class="stat"><strong id="total-count">0</strong> app(s) published</div>
-        <div class="stat"><strong id="visible-count">0</strong> currently visible</div>
-      </section>
+        <section class="intro-grid">
+          <article class="panel">
+            <div class="panel-inner">
+              <h2>Use in CapRover</h2>
+              <ol class="summary-list">
+                <li>Open <strong>One-Click Apps/Databases</strong> in CapRover.</li>
+                <li>Add <code>https://oneclickapps.sabino.pro</code> as a custom repository.</li>
+                <li>Install the published app from the catalog.</li>
+              </ol>
+            </div>
+          </article>
 
-      <section id="catalog" class="catalog" aria-live="polite"></section>
-      <p id="status" class="status">Loading catalog...</p>
+          <aside class="panel">
+            <div class="panel-inner">
+              <h2>Published endpoints</h2>
+              <ul class="summary-list">
+                <li><a href="/v4/list"><code>/v4/list</code></a></li>
+                <li><a href="/v4/apps/supabase"><code>/v4/apps/supabase</code></a></li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+
+        <section class="toolbar" aria-label="Catalog filters">
+          <input id="search" type="search" placeholder="Search apps, tags, descriptions..." />
+          <select id="category">
+            <option value="all">All categories</option>
+          </select>
+        </section>
+
+        <section class="stats" aria-label="Catalog stats">
+          <div class="stat"><strong id="total-count">0</strong> published app(s)</div>
+          <div class="stat"><strong id="visible-count">0</strong> visible after filters</div>
+        </section>
+
+        <section id="catalog" class="catalog" aria-live="polite"></section>
+        <p id="status" class="status">Loading catalog…</p>
+      </div>
     </main>
 
+    <footer>
+      <div class="container">Developed by Sabino Software</div>
+    </footer>
+
     <template id="app-card-template">
-      <article class="card">
+      <article class="panel card">
         <div class="card-top">
-          <img alt="" />
-          <div>
-            <h2></h2>
-            <div class="slug"></div>
+          <div class="card-heading">
+            <img alt="" />
+            <div>
+              <h2></h2>
+              <div class="slug"></div>
+            </div>
           </div>
+          <div class="service-pill"></div>
         </div>
 
         <p class="description"></p>
@@ -320,33 +468,30 @@
             <span class="meta-value category-value"></span>
           </div>
           <div class="meta">
-            <span class="meta-label">Services</span>
-            <span class="meta-value services-value"></span>
-          </div>
-          <div class="meta">
             <span class="meta-label">Variables</span>
             <span class="meta-value variables-value"></span>
           </div>
           <div class="meta">
-            <span class="meta-label">Public app</span>
+            <span class="meta-label">Public service</span>
             <span class="meta-value public-service-value"></span>
+          </div>
+          <div class="meta">
+            <span class="meta-label">Docs</span>
+            <span class="meta-value docs-value"></span>
           </div>
         </div>
 
         <div class="tags"></div>
 
         <div class="actions">
-          <a class="primary template-link" target="_blank" rel="noreferrer">Open template JSON</a>
+          <a class="template-link" target="_blank" rel="noreferrer">Template JSON</a>
           <a class="docs-link" target="_blank" rel="noreferrer">Documentation</a>
         </div>
       </article>
     </template>
 
     <script>
-      const state = {
-        apps: [],
-        filteredApps: [],
-      };
+      const state = { apps: [], filteredApps: [] };
 
       const els = {
         search: document.getElementById('search'),
@@ -363,18 +508,12 @@
         if (!response.ok) {
           throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
-
         return response.json();
       }
 
       function buildCategoryOptions(apps) {
-        const categories = Array.from(
-          new Set(
-            apps
-              .map((app) => app.category)
-              .filter(Boolean)
-              .sort((a, b) => a.localeCompare(b))
-          )
+        const categories = Array.from(new Set(apps.map((app) => app.category).filter(Boolean))).sort((a, b) =>
+          a.localeCompare(b)
         );
 
         els.category.innerHTML = '<option value="all">All categories</option>';
@@ -391,13 +530,7 @@
         const category = els.category.value;
 
         state.filteredApps = state.apps.filter((app) => {
-          const haystack = [
-            app.name,
-            app.displayName,
-            app.description,
-            app.category,
-            ...(app.tags || []),
-          ]
+          const haystack = [app.name, app.displayName, app.description, app.category, ...(app.tags || [])]
             .filter(Boolean)
             .join(' ')
             .toLowerCase();
@@ -433,36 +566,29 @@
 
         for (const app of state.filteredApps) {
           const fragment = els.cardTemplate.content.cloneNode(true);
-          const card = fragment.querySelector('.card');
-          const image = card.querySelector('img');
-          const title = card.querySelector('h2');
-          const slug = card.querySelector('.slug');
-          const description = card.querySelector('.description');
-          const category = card.querySelector('.category-value');
-          const services = card.querySelector('.services-value');
-          const variables = card.querySelector('.variables-value');
-          const publicService = card.querySelector('.public-service-value');
-          const tags = card.querySelector('.tags');
-          const templateLink = card.querySelector('.template-link');
-          const docsLink = card.querySelector('.docs-link');
+          const root = fragment.querySelector('.card');
+          root.querySelector('img').src = app.logoUrl;
+          root.querySelector('img').alt = `${app.displayName} logo`;
+          root.querySelector('h2').textContent = app.displayName;
+          root.querySelector('.slug').textContent = app.name;
+          root.querySelector('.service-pill').textContent = `${app.serviceCount} service${app.serviceCount === 1 ? '' : 's'}`;
+          root.querySelector('.description').textContent = app.description;
+          root.querySelector('.category-value').textContent = app.category || 'Uncategorized';
+          root.querySelector('.variables-value').textContent = String(app.variableCount ?? '—');
+          root.querySelector('.public-service-value').textContent = app.publicService || '—';
+          root.querySelector('.docs-value').textContent = app.documentation ? 'Available' : 'Template only';
 
-          image.src = app.logoUrl;
-          image.alt = `${app.displayName} logo`;
-          title.textContent = app.displayName;
-          slug.textContent = app.name;
-          description.textContent = app.description;
-          category.textContent = app.category || 'Uncategorized';
-          services.textContent = String(app.serviceCount ?? '—');
-          variables.textContent = String(app.variableCount ?? '—');
-          publicService.textContent = app.publicService || '—';
+          const templateLink = root.querySelector('.template-link');
           templateLink.href = app.templateUrl;
+
+          const docsLink = root.querySelector('.docs-link');
           docsLink.href = app.documentation || app.templateUrl;
           docsLink.textContent = app.documentation ? 'Documentation' : 'Template details';
 
+          const tags = root.querySelector('.tags');
           for (const tag of app.tags || []) {
             tags.appendChild(createTag(tag));
           }
-
           if (app.isOfficial) {
             tags.appendChild(createTag('Official-style metadata'));
           }
@@ -493,8 +619,8 @@
               return {
                 ...summary,
                 ...meta,
-                logoUrl: meta.logoUrl || `/v4/logos/${summary.logoUrl}`,
                 templateUrl: `/v4/apps/${summary.name}`,
+                logoUrl: meta.logoUrl || `/v4/logos/${summary.logoUrl}`,
                 documentation: meta.documentation || detail.caproverOneClickApp?.documentation || '',
                 serviceCount: Object.keys(services).length,
                 variableCount: variables.length,
@@ -514,7 +640,6 @@
 
       els.search.addEventListener('input', filterApps);
       els.category.addEventListener('change', filterApps);
-
       loadCatalog();
     </script>
   </body>
