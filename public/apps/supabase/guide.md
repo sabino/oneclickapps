@@ -22,6 +22,7 @@ The final `supabase.yml` is the standalone artifact CapRover consumes, but it is
 1. After deployment, enable HTTPS on the public `supabase` service in CapRover
 2. Large multi-service stacks can exhaust Docker Swarm overlay VIPs on small default network ranges
 3. If deployment fails with overlay IP allocation issues, free unused services or expand the shared overlay capacity before retrying
+4. Supavisor runs as an internal service by default so multiple Supabase installs can coexist on the same CapRover host. If you need direct external pooler access, publish custom ports manually after install.
 
 ## Optional OpenAI enhancement
 

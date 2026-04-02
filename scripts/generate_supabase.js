@@ -668,10 +668,6 @@ const allServices = {
   "$$cap_appname-supavisor": {
     restart: "unless-stopped",
     depends_on: ["$$cap_appname-db"],
-    ports: [
-      "$$cap_postgres_session_port:5432",
-      "$$cap_postgres_transaction_port:6543",
-    ],
     environment: {
       PORT: "4000",
       POSTGRES_PORT: internalPostgresPort,
@@ -739,8 +735,6 @@ const postgresVariables = [
   variable("$$cap_postgres_password", "Postgres password", "$$cap_gen_random_hex(32)", {
     validRegex: "/.{1,}/",
   }),
-  numericVariable("$$cap_postgres_session_port", "Supavisor session mode port", "5432"),
-  numericVariable("$$cap_postgres_transaction_port", "Supavisor transaction mode port", "6543"),
 ];
 
 const keyVariables = [
@@ -971,6 +965,6 @@ writeTemplate(
     description:
       "Full self-hosted Supabase stack for CapRover, updated to the current Docker-based deployment layout.",
     startInstructions: `Deploys the current full Supabase self-host Docker stack on CapRover using baked-in upstream config assets. Most fields already have safe defaults; in the common case you only need the app name and can leave the advanced overrides alone.\n\n${overlayCapacityWarning}`,
-    endInstructions: `Supabase is deployed behind Kong at https://$$cap_appname.$$cap_root_domain by default. Studio, Auth, REST, Storage, Realtime, Functions, Postgres, Supavisor, and Analytics are included. Review the generated secrets, set a custom domain if needed, and test Studio plus the database pooler ports you selected.\n\n${kongHttpsReminder}`,
+    endInstructions: `Supabase is deployed behind Kong at https://$$cap_appname.$$cap_root_domain by default. Studio, Auth, REST, Storage, Realtime, Functions, Postgres, Supavisor, and Analytics are included. Review the generated secrets, set a custom domain if needed, and test Studio plus the core APIs after deploy.\n\nSupavisor runs as an internal service by default so multiple Supabase installs can coexist on the same CapRover host. If you need direct external pooler access, publish custom ports manually after install.\n\n${kongHttpsReminder}`,
   }),
 );
