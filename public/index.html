@@ -408,7 +408,7 @@
   <body>
     <header>
       <div class="container navbar">
-        <a class="brand" href="/">
+        <a class="brand" id="brand-link" href="/">
           <span class="brand-mark">S</span>
           <span>Sabino One-Click Apps</span>
         </a>
@@ -438,7 +438,7 @@
                 <li>Open <strong>Apps</strong> in CapRover.</li>
                 <li>Open <strong>One Click Apps</strong>.</li>
                 <li>Scroll down to <strong>3rd party repositories</strong>.</li>
-                <li>Paste <code>https://oneclickapps.sabino.pro</code> and click <strong>Connect New Repository</strong>.</li>
+                <li>Paste <code class="repo-url-inline">https://oneclickapps.sabino.pro</code> and click <strong>Connect New Repository</strong>.</li>
               </ol>
             </div>
             <div class="repo-box">
@@ -513,8 +513,19 @@
 
     <script>
       const state = { apps: [], filteredApps: [] };
+      const basePath = (() => {
+        const path = window.location.pathname;
+        return path.endsWith('/') ? path : `${path.slice(0, path.lastIndexOf('/') + 1)}`;
+      })();
+      const repositoryUrl = `${window.location.origin}${basePath.endsWith('/') && basePath !== '/' ? basePath.slice(0, -1) : basePath}`;
+
+      function withBasePath(path) {
+        if (/^https?:\/\//i.test(path)) return path;
+        return new URL(path.replace(/^\//, ''), `${window.location.origin}${basePath}`).toString();
+      }
 
       const els = {
+        brandLink: document.getElementById('brand-link'),
         search: document.getElementById('search'),
         category: document.getElementById('category'),
         catalog: document.getElementById('catalog'),
@@ -525,6 +536,7 @@
         copyRepo: document.getElementById('copy-repo'),
         copyStatus: document.getElementById('copy-status'),
         repoUrl: document.getElementById('repo-url'),
+        repoUrlInline: Array.from(document.querySelectorAll('.repo-url-inline')),
       };
 
       async function fetchJson(url) {
@@ -536,12 +548,36 @@
       }
 
       async function copyRepositoryUrl() {
+        const text = els.repoUrl.textContent.trim();
         try {
-          await navigator.clipboard.writeText(els.repoUrl.textContent.trim());
+          if (!navigator.clipboard || !window.isSecureContext) {
+            throw new Error('Clipboard API unavailable');
+          }
+          await navigator.clipboard.writeText(text);
           els.copyStatus.textContent = 'Repository URL copied.';
         } catch (error) {
-          console.error(error);
-          els.copyStatus.textContent = 'Copy failed. Select the URL and copy it manually.';
+          try {
+            const input = document.createElement('textarea');
+            input.value = text;
+            input.setAttribute('readonly', '');
+            input.style.position = 'fixed';
+            input.style.opacity = '0';
+            input.style.pointerEvents = 'none';
+            document.body.appendChild(input);
+            input.focus();
+            input.select();
+            input.setSelectionRange(0, input.value.length);
+            const copied = document.execCommand('copy');
+            document.body.removeChild(input);
+            if (!copied) {
+              throw new Error('execCommand copy failed');
+            }
+            els.copyStatus.textContent = 'Repository URL copied.';
+          } catch (fallbackError) {
+            console.error(error);
+            console.error(fallbackError);
+            els.copyStatus.textContent = 'Copy failed. Select the URL and copy it manually.';
+          }
         }
       }
 
@@ -632,9 +668,14 @@
 
       async function loadCatalog() {
         try {
+          els.brandLink.href = withBasePath('');
+          els.repoUrl.textContent = repositoryUrl;
+          for (const node of els.repoUrlInline) {
+            node.textContent = repositoryUrl;
+          }
           const [listData, metadata] = await Promise.all([
-            fetchJson('/v4/list'),
-            fetchJson('/catalog-metadata.json').catch(() => ({})),
+            fetchJson(withBasePath('v4/list')),
+            fetchJson(withBasePath('catalog-metadata.json')).catch(() => ({})),
           ]);
 
           const apps = await Promise.all(
@@ -650,8 +691,8 @@
               return {
                 ...summary,
                 ...meta,
-                templateUrl: `/v4/apps/${summary.name}`,
-                logoUrl: meta.logoUrl || `/v4/logos/${summary.logoUrl}`,
+                templateUrl: withBasePath(`v4/apps/${summary.name}`),
+                logoUrl: meta.logoUrl ? withBasePath(meta.logoUrl) : withBasePath(`v4/logos/${summary.logoUrl}`),
                 documentation: meta.documentation || detail.caproverOneClickApp?.documentation || '',
                 serviceCount: Object.keys(services).length,
                 variableCount: variables.length,
