@@ -28,6 +28,17 @@ const pathOfSourceDirectory = path.join(pathOfPublic, 'v2');
 const pathOfSourceDirectoryApps = path.join(pathOfSourceDirectory, 'apps');
 const pathOfSourceDirectoryLogos = path.join(pathOfSourceDirectory, 'logos');
 
+function copyPublicRootFiles() {
+    const publicEntries = fs.readdirSync(pathOfPublic);
+    publicEntries.forEach(entry => {
+        if (['v2', 'v3', 'v4'].includes(entry)) {
+            return;
+        }
+
+        fs.copySync(path.join(pathOfPublic, entry), path.join(pathOfDist, entry));
+    });
+}
+
 
 function createAppList(appsList, pathOfApps) {
     const apps = appsList.filter(v => v.includes('.json'));
@@ -153,7 +164,7 @@ function buildDist() {
             fs.outputJsonSync(path.join(pathOfDistV2, 'list'), v3List); // TODO delete oneClickApps: 
             fs.outputJsonSync(path.join(pathOfDistV3, 'list'), v3List);
             fs.outputJsonSync(path.join(pathOfDistV4, 'list'), v3List);
-            return fs.copySync(path.join(pathOfPublic, 'CNAME'), path.join(pathOfDist, 'CNAME'));
+            return copyPublicRootFiles();
         });
 }
 

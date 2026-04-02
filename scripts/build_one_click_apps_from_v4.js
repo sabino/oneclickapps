@@ -15,6 +15,17 @@ const pathOfSourceDirectory = path.join(pathOfPublic, 'v4');
 const pathOfSourceDirectoryApps = path.join(pathOfSourceDirectory, 'apps');
 const pathOfSourceDirectoryLogos = path.join(pathOfSourceDirectory, 'logos');
 
+function copyPublicRootFiles() {
+    const publicEntries = fs.readdirSync(pathOfPublic);
+    publicEntries.forEach(entry => {
+        if (['v2', 'v3', 'v4'].includes(entry)) {
+            return;
+        }
+
+        fs.copySync(path.join(pathOfPublic, entry), path.join(pathOfDist, entry));
+    });
+}
+
 /**
  * Creates a listing of apps for GET http://oneclickapps.caprover.com/v4
  * {
@@ -180,7 +191,7 @@ function buildDist() {
             fs.outputJsonSync(path.join(pathOfDistV4, 'list'), v3List);
         })
         .then(function () {
-            return fs.copySync(path.join(pathOfPublic, 'CNAME'), path.join(pathOfDist, 'CNAME'));
+            return copyPublicRootFiles();
         });
 }
 

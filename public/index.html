@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>oneclickapps.sabino.pro</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 30%),
+          linear-gradient(180deg, #020617, #0f172a 65%);
+      }
+
+      main {
+        width: min(760px, calc(100vw - 32px));
+        padding: 32px;
+        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.86);
+        box-shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      p {
+        line-height: 1.6;
+        color: #cbd5e1;
+      }
+
+      code,
+      a {
+        color: #7dd3fc;
+      }
+
+      .card {
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(125, 211, 252, 0.2);
+      }
+
+      ul {
+        margin: 12px 0 0 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>oneclickapps.sabino.pro</h1>
+      <p>
+        Custom CapRover one-click app catalog currently publishing the full self-hosted Supabase stack.
+      </p>
+
+      <div class="card">
+        <p><strong>Use this repository in CapRover:</strong></p>
+        <ul>
+          <li>Add <code>https://oneclickapps.sabino.pro</code> as a custom one-click app repository.</li>
+          <li>The CapRover catalog endpoint is available at <a href="/v4/list">/v4/list</a>.</li>
+          <li>The published app template is available at <a href="/v4/apps/supabase">/v4/apps/supabase</a>.</li>
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>
