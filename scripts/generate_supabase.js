@@ -24,6 +24,7 @@ const BOOL_REGEX = "/^(true|false)$/";
 const NUMBER_REGEX = "/^\\d+$/";
 const IMAGE_TAG_REGEX = "/^([^\\s^\\/])+$/";
 const DEFAULT_PUBLIC_URL = "https://$$cap_appname.$$cap_root_domain";
+const DEFAULT_APP_NAME = "$$cap_appname";
 
 function readAsset(relativePath) {
   return fs.readFileSync(path.join(assetsRoot, relativePath), "utf8").replace(/\r\n/g, "\n");
@@ -535,9 +536,9 @@ const allServices = {
       REQUEST_ALLOW_X_FORWARDED_PATH: "true",
       FILE_SIZE_LIMIT: "$$cap_storage_file_size_limit",
       STORAGE_BACKEND: "file",
-      GLOBAL_S3_BUCKET: "$$cap_global_s3_bucket",
+      GLOBAL_S3_BUCKET: DEFAULT_APP_NAME,
       FILE_STORAGE_BACKEND_PATH: "/var/lib/storage",
-      TENANT_ID: "$$cap_storage_tenant_id",
+      TENANT_ID: DEFAULT_APP_NAME,
       REGION: "$$cap_storage_region",
       ENABLE_IMAGE_TRANSFORMATION: "true",
       IMGPROXY_URL: "http://srv-captain--$$cap_appname-imgproxy:5001",
@@ -688,7 +689,7 @@ const allServices = {
       METRICS_JWT_SECRET: "$$cap_jwt_secret",
       REGION: "local",
       ERL_AFLAGS: "-proto_dist inet_tcp",
-      POOLER_TENANT_ID: "$$cap_pooler_tenant_id",
+      POOLER_TENANT_ID: DEFAULT_APP_NAME,
       POOLER_DEFAULT_POOL_SIZE: "$$cap_pooler_default_pool_size",
       POOLER_MAX_CLIENT_CONN: "$$cap_pooler_max_client_conn",
       POOLER_POOL_MODE: "transaction",
@@ -804,9 +805,6 @@ const keyVariables = [
 ];
 
 const poolerVariables = [
-  variable("$$cap_pooler_tenant_id", "Supavisor tenant id", "$$cap_appname", {
-    validRegex: "/.{1,}/",
-  }),
   numericVariable("$$cap_pooler_default_pool_size", "Supavisor default pool size", "20"),
   numericVariable("$$cap_pooler_max_client_conn", "Supavisor max client connections", "100"),
   numericVariable("$$cap_pooler_db_pool_size", "Supavisor internal DB pool size", "5"),
@@ -862,9 +860,7 @@ const apiVariables = [
   numericVariable("$$cap_pgrst_db_max_rows", "PostgREST max rows", "1000"),
   variable("$$cap_pgrst_db_extra_search_path", "PostgREST extra search path", "public"),
   numericVariable("$$cap_storage_file_size_limit", "Storage file size limit bytes", "52428800"),
-  variable("$$cap_global_s3_bucket", "Storage bucket/directory name", "$$cap_appname"),
   variable("$$cap_storage_region", "Storage region identifier", "local"),
-  variable("$$cap_storage_tenant_id", "Storage tenant id", "$$cap_appname"),
   booleanVariable("$$cap_imgproxy_auto_webp", "imgproxy auto webp", "true"),
   booleanVariable("$$cap_functions_verify_jwt", "Verify JWT in Edge Functions", "false"),
 ];
