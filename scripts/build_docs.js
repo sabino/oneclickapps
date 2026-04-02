@@ -61,7 +61,9 @@ function renderMarkdown(markdown) {
         if (!inCodeBlock) {
             return;
         }
-        html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
+        html.push(
+            `<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre></div>`
+        );
         inCodeBlock = false;
         codeLines = [];
     }
@@ -213,7 +215,7 @@ function layoutCss() {
         z-index: 10;
       }
       .container {
-        width: min(1080px, calc(100vw - 32px));
+        width: min(1240px, calc(100vw - 32px));
         margin: 0 auto;
       }
       .navbar {
@@ -352,11 +354,55 @@ function layoutCss() {
       .content-inner pre {
         margin: 0 0 16px;
         overflow: auto;
-        padding: 16px;
+        padding: 52px 16px 16px;
         border-radius: 14px;
         background: #0d1521;
         border: 1px solid var(--border);
         color: var(--text);
+        scrollbar-width: thin;
+        scrollbar-color: rgba(148, 163, 184, 0.36) transparent;
+      }
+      .content-inner pre::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      .content-inner pre::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .content-inner pre::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.28);
+        border-radius: 999px;
+      }
+      .content-inner pre code {
+        display: block;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .code-block {
+        position: relative;
+        margin-bottom: 16px;
+      }
+      .copy-code-button {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: 1px solid rgba(22, 196, 127, 0.35);
+        background: rgba(22, 196, 127, 0.12);
+        color: var(--accent);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        z-index: 1;
+      }
+      .copy-code-button:hover {
+        filter: brightness(1.06);
+      }
+      .copy-code-button.copied {
+        color: var(--text);
+        background: rgba(22, 196, 127, 0.22);
       }
       .breadcrumbs {
         margin: 0 0 18px;
@@ -409,6 +455,55 @@ function pageShell(options) {
     <footer>
       <div class="container">Built for CapRover third-party repositories.</div>
     </footer>
+    <script>
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+
+        const input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        input.style.pointerEvents = 'none';
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+        const copied = document.execCommand('copy');
+        document.body.removeChild(input);
+        return copied;
+      }
+
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy-code]');
+        if (!button) {
+          return;
+        }
+
+        const pre = button.parentElement.querySelector('pre');
+        if (!pre) {
+          return;
+        }
+
+        const originalText = button.textContent;
+        try {
+          await copyText(pre.innerText.replace(/\\n$/, ''));
+          button.textContent = 'Copied';
+          button.classList.add('copied');
+        } catch (error) {
+          console.error(error);
+          button.textContent = 'Copy failed';
+        }
+
+        window.setTimeout(() => {
+          button.textContent = originalText;
+          button.classList.remove('copied');
+        }, 1800);
+      });
+    </script>
   </body>
 </html>`;
 }
