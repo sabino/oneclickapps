@@ -415,6 +415,7 @@
 
         <nav class="header-links" aria-label="External links">
           <a href="https://github.com/sabino/oneclickapps">GitHub</a>
+          <a href="https://caprover.com/">CapRover</a>
         </nav>
       </div>
     </header>
@@ -425,8 +426,8 @@
           <div class="eyebrow">3rd Party Repository</div>
           <h1>Apps</h1>
           <p>
-            Supabase is a complex app and requires custom file generation. For a more updated and maintained
-            version, add this repository to your CapRover one-click apps and install it from there.
+            A growing catalog of custom CapRover one-click apps. Add this repository in CapRover, browse
+            what is available, and install the apps directly from the One Click Apps page.
           </p>
         </section>
 
@@ -505,7 +506,8 @@
         <div class="tags"></div>
 
         <div class="actions">
-          <a class="docs-link" target="_blank" rel="noreferrer">Documentation</a>
+          <a class="official-link" target="_blank" rel="noreferrer">Official docs</a>
+          <a class="guide-link" target="_blank" rel="noreferrer">CapRover guide</a>
           <a class="source-link" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </article>
@@ -646,9 +648,14 @@
           root.querySelector('.category-value').textContent = app.category || 'Uncategorized';
           root.querySelector('.variables-value').textContent = String(app.variableCount ?? '—');
           root.querySelector('.public-service-value').textContent = app.publicService || '—';
-          const docsLink = root.querySelector('.docs-link');
-          docsLink.href = app.documentation || app.templateUrl;
-          docsLink.textContent = app.documentation ? 'Documentation' : 'Template details';
+          const officialLink = root.querySelector('.official-link');
+          const guideLink = root.querySelector('.guide-link');
+          officialLink.href = app.documentation || app.templateUrl;
+          officialLink.textContent = app.documentation ? 'Official docs' : 'Template details';
+          guideLink.href = app.caproverGuide ? withBasePath(app.caproverGuide.replace(/^\//, '')) : app.templateUrl;
+          if (!app.caproverGuide) {
+            guideLink.textContent = 'Template details';
+          }
 
           const sourceLink = root.querySelector('.source-link');
           sourceLink.href = 'https://github.com/sabino/oneclickapps';

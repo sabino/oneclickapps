@@ -10,6 +10,7 @@
             "edge-functions",
             "analytics"
         ],
-        "documentation": "https://supabase.com/docs/guides/self-hosting/docker"
+        "documentation": "https://supabase.com/docs/guides/self-hosting/docker",
+        "caproverGuide": "/apps/supabase/"
     }
 }
