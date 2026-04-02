@@ -19,6 +19,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const assetsRoot = path.join(__dirname, "supabase-assets");
 const outputDir = path.join(repoRoot, "public", "v4", "apps");
 const SUPABASE_SELF_HOST_DOCS = "https://supabase.com/docs/guides/self-hosting/docker";
+const OVERLAY_CAPACITY_DOCS = "https://oneclickapps.sabino.pro/docs/increase-overlay-network-capacity/";
 const BOOL_REGEX = "/^(true|false)$/";
 const NUMBER_REGEX = "/^\\d+$/";
 const IMAGE_TAG_REGEX = "/^([^\\s^\\/])+$/";
@@ -966,7 +967,7 @@ function buildTemplateDocument({
 }
 
 const overlayCapacityWarning =
-  "If deployment fails with `No NodeId was found` or Docker logs mention `could not find an available IP while allocating VIP`, your shared CapRover swarm overlay is out of addresses. Remove unused services or follow the `/24 -> /20` migration guide in this repo before retrying.";
+  `If deployment fails with \`No NodeId was found\` or Docker logs mention \`could not find an available IP while allocating VIP\`, your shared CapRover swarm overlay is out of addresses. Remove unused services or follow the overlay capacity guide at ${OVERLAY_CAPACITY_DOCS} before retrying.`;
 const kongHttpsReminder =
   "After deploy, enable HTTPS/TLS on the `$$cap_appname` service in CapRover. Kong is the public Supabase gateway and should be the service behind your domain and certificate.";
 
