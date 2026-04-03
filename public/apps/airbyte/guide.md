@@ -9,11 +9,19 @@ It deploys a single CapRover-facing manager service that:
 - creates the `kind` cluster and Helm release on the host
 - proxies the Airbyte UI back through the CapRover app domain
 
+## Current limitation
+
+This implementation currently supports only a single Airbyte deployment per host.
+
+That limitation comes from the official `abctl local` flow, which uses a singleton local `kind` cluster under the hood.
+
+If another Airbyte local cluster already exists on the host, this manager now fails fast and reports that only one deployment is supported for now.
+
 ## Why the host ingress port is required
 
 `abctl` creates an ingress inside the `kind` cluster and binds it to a host port.
 
-That means every Airbyte installation on the same CapRover host must use its own unique host ingress port. The CapRover app still gives you the normal public domain, but the host port is the bridge between the manager proxy and the Airbyte cluster it creates.
+The CapRover app still gives you the normal public domain, but the host port is the bridge between the manager proxy and the Airbyte cluster it creates.
 
 ## First install behavior
 

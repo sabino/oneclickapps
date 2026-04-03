@@ -82,7 +82,7 @@ function renderValue(value, indent) {
     return Object.entries(value)
       .map(([key, nestedValue]) => {
         if (Array.isArray(nestedValue) || isPlainObject(nestedValue) || nestedValue instanceof Literal) {
-          return `${pad}${key}:\n${renderValue(nestedValue, indent + 4)}`;
+          return `${pad}${key}:\n${renderValue(nestedValue, indent + 2)}`;
         }
         return `${pad}${key}: ${renderValue(nestedValue, indent)}`;
       })
@@ -230,7 +230,7 @@ const template = {
         "$$cap_airbyte_host_port",
         "Host ingress port",
         "",
-        "Required. Choose a unique unused host port for the Airbyte kind ingress, for example 18080 or 18081."
+        "Required. Choose an unused host port for the Airbyte kind ingress, for example 18080. Current limitation: only one Airbyte deployment per host is supported while this app uses abctl local."
       ),
       variable(
         "$$cap_additional_hosts",
@@ -280,7 +280,8 @@ const template = {
       start: `Airbyte is deployed as a manager app that talks to the host Docker daemon and creates the official Airbyte kind cluster under the hood.
 
 Important notes:
-- Choose a unique Host ingress port for every Airbyte installation on this host.
+- Current limitation: only one Airbyte deployment per host is supported because abctl local uses a singleton kind cluster under the hood.
+- Choose an unused Host ingress port for the Airbyte ingress on this host.
 - The first install can take several minutes while abctl creates the cluster and installs the Helm chart.
 - This app mounts /var/run/docker.sock and adds the required Linux capabilities through cap_add.
 - If you later want to remove the Airbyte cluster from the host, switch Manager mode to uninstall, redeploy, wait for completion, and only then delete the CapRover app.`,
@@ -295,7 +296,7 @@ Next steps:
     displayName: "Airbyte",
     isOfficial: false,
     description:
-      "Official-style Airbyte bootstrap app for CapRover. Runs abctl against the host Docker socket, creates the kind cluster, and proxies the Airbyte UI through the CapRover app domain.",
+      "Airbyte bootstrap app for CapRover. Runs abctl against the host Docker socket, creates the kind cluster, and proxies the Airbyte UI through the CapRover app domain. One deployment per host for now.",
     documentation: docsUrl,
   },
 };
@@ -309,12 +310,16 @@ const header = [
 const yamlBody = Object.entries(template)
   .map(([key, value]) => {
     if (Array.isArray(value) || isPlainObject(value) || value instanceof Literal) {
-      return `${key}:\n${renderValue(value, 4)}`;
+      return `${key}:\n${renderValue(value, 2)}`;
     }
     return `${key}: ${renderValue(value, 0)}`;
   })
   .join("\n");
 
-const formatted = prettier.format(`${header}\n${yamlBody}\n`, { parser: "yaml" });
+const prettierConfig = prettier.resolveConfig.sync(outputPath) || {};
+const formatted = prettier.format(`${header}\n${yamlBody}\n`, {
+  ...prettierConfig,
+  parser: "yaml",
+});
 fs.writeFileSync(outputPath, formatted);
 console.log(`Generated ${path.relative(repoRoot, outputPath)}`);
