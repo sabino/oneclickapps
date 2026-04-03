@@ -11,5 +11,10 @@
             "analytics"
         ],
         "documentation": "https://supabase.com/docs/guides/self-hosting/docker"
+    },
+    "airbyte": {
+        "category": "Data Integration",
+        "tags": ["airbyte", "elt", "kind", "helm", "docker-socket", "manager"],
+        "documentation": "https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart"
     }
 }

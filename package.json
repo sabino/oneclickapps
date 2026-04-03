@@ -6,7 +6,8 @@
   "scripts": {
     "formatter": "prettier --check './public/**/*.(json|yml)'",
     "formatter-write": "prettier --write './public/**/*.(json|yml)'",
-    "build": "rm -rf ./dist/ && mkdir -p dist && node ./scripts/build_one_click_apps.js && node ./scripts/build_one_click_apps_from_v4.js && node ./scripts/build_docs.js",
+    "build": "rm -rf ./dist/ && mkdir -p dist && node ./scripts/generate_airbyte.js && node ./scripts/build_one_click_apps.js && node ./scripts/build_one_click_apps_from_v4.js && node ./scripts/build_docs.js",
+    "generate_airbyte": "node ./scripts/generate_airbyte.js",
     "generate_supabase": "node ./scripts/generate_supabase.js",
     "validate_apps": "node ./scripts/validate_apps.js"
   },
