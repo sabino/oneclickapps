@@ -82,7 +82,7 @@ function renderValue(value, indent) {
     return Object.entries(value)
       .map(([key, nestedValue]) => {
         if (Array.isArray(nestedValue) || isPlainObject(nestedValue) || nestedValue instanceof Literal) {
-          return `${pad}${key}:\n${renderValue(nestedValue, indent + 4)}`;
+          return `${pad}${key}:\n${renderValue(nestedValue, indent + 2)}`;
         }
         return `${pad}${key}: ${renderValue(nestedValue, indent)}`;
       })
@@ -310,12 +310,16 @@ const header = [
 const yamlBody = Object.entries(template)
   .map(([key, value]) => {
     if (Array.isArray(value) || isPlainObject(value) || value instanceof Literal) {
-      return `${key}:\n${renderValue(value, 4)}`;
+      return `${key}:\n${renderValue(value, 2)}`;
     }
     return `${key}: ${renderValue(value, 0)}`;
   })
   .join("\n");
 
-const formatted = prettier.format(`${header}\n${yamlBody}\n`, { parser: "yaml" });
+const prettierConfig = prettier.resolveConfig.sync(outputPath) || {};
+const formatted = prettier.format(`${header}\n${yamlBody}\n`, {
+  ...prettierConfig,
+  parser: "yaml",
+});
 fs.writeFileSync(outputPath, formatted);
 console.log(`Generated ${path.relative(repoRoot, outputPath)}`);
