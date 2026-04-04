@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Increase overlay network capacity · Sabino One-Click Apps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Busy CapRover hosts can eventually run into a shared swarm networking problem: the global `captain-overlay-network` runs out of VIP/IP allocations." />
+    <link rel="icon" type="image/svg+xml" href="../../assets/caprover-green.svg" />
+    <style>
+      :root {
+        --page-bg: #0b1017;
+        --surface: #121926;
+        --surface-soft: #1a2231;
+        --text: #ecf3fb;
+        --muted: #b2c0d1;
+        --muted-soft: #7f90a8;
+        --border: rgba(148, 163, 184, 0.18);
+        --accent: #16c47f;
+        --accent-soft: rgba(22, 196, 127, 0.16);
+        --shadow: 0 18px 48px rgba(2, 6, 23, 0.35);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--page-bg);
+        color: var(--text);
+        min-height: 100%;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      code, pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      header {
+        background: rgba(11, 16, 23, 0.92);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .container {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+      }
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 72px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--accent-soft), rgba(255, 255, 255, 0.02) 85%);
+        border: 1px solid var(--border);
+        padding: 7px;
+      }
+      .brand-mark img {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .header-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .header-links a {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      main {
+        padding: 28px 0 64px;
+        flex: 1 0 auto;
+      }
+      .eyebrow {
+        color: var(--muted-soft);
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+      }
+      .hero {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+      .hero p {
+        margin: 0;
+        max-width: 860px;
+        color: var(--muted);
+        line-height: 1.65;
+        font-size: 0.98rem;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+      }
+      .panel-inner {
+        padding: 24px;
+      }
+      .docs-grid {
+        display: grid;
+        gap: 16px;
+      }
+      .doc-card {
+        display: grid;
+        gap: 10px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+      .doc-card h2 {
+        margin: 0;
+        font-size: 1.22rem;
+        letter-spacing: -0.02em;
+      }
+      .doc-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .doc-meta {
+        color: var(--muted-soft);
+        font-size: 0.9rem;
+      }
+      .content {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+      }
+      .content-inner {
+        padding: 28px;
+      }
+      .content-inner h1,
+      .content-inner h2,
+      .content-inner h3 {
+        color: var(--text);
+        letter-spacing: -0.03em;
+      }
+      .content-inner h1 { font-size: 1.9rem; margin: 0 0 18px; }
+      .content-inner h2 { font-size: 1.18rem; margin: 28px 0 12px; }
+      .content-inner h3 { font-size: 1rem; margin: 22px 0 10px; }
+      .content-inner p,
+      .content-inner ul,
+      .content-inner ol {
+        margin: 0 0 14px;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+      .content-inner ul,
+      .content-inner ol {
+        padding-left: 24px;
+      }
+      .content-inner :not(pre) > code {
+        display: inline-block;
+        padding: 0.18rem 0.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: rgba(22, 196, 127, 0.08);
+        color: #b7f7db;
+        font-size: 0.92em;
+        line-height: 1.4;
+      }
+      .content-inner pre {
+        margin: 0 0 16px;
+        overflow: hidden;
+        padding: 52px 16px 16px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #101a28 0%, #0d1521 100%);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        color: var(--text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+      .content-inner pre code {
+        display: block;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        line-height: 1.7;
+      }
+      .content-inner .hljs {
+        color: #e6eef8;
+        background: transparent;
+      }
+      .content-inner .hljs-comment,
+      .content-inner .hljs-quote {
+        color: #7f90a8;
+      }
+      .content-inner .hljs-keyword,
+      .content-inner .hljs-selector-tag,
+      .content-inner .hljs-literal,
+      .content-inner .hljs-section,
+      .content-inner .hljs-link {
+        color: #7dd3fc;
+      }
+      .content-inner .hljs-string,
+      .content-inner .hljs-attr,
+      .content-inner .hljs-regexp {
+        color: #86efac;
+      }
+      .content-inner .hljs-number,
+      .content-inner .hljs-symbol,
+      .content-inner .hljs-bullet,
+      .content-inner .hljs-built_in {
+        color: #fbbf24;
+      }
+      .content-inner .hljs-title,
+      .content-inner .hljs-function,
+      .content-inner .hljs-name,
+      .content-inner .hljs-title.function_ {
+        color: #c4b5fd;
+      }
+      .content-inner .hljs-variable,
+      .content-inner .hljs-template-variable,
+      .content-inner .hljs-meta,
+      .content-inner .hljs-type,
+      .content-inner .hljs-params {
+        color: #f9a8d4;
+      }
+      .code-block {
+        position: relative;
+        margin-bottom: 16px;
+      }
+      .code-block::before {
+        content: '';
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #ef4444;
+        box-shadow: 16px 0 0 #f59e0b, 32px 0 0 #22c55e;
+        opacity: 0.9;
+      }
+      .copy-code-button {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: 1px solid rgba(22, 196, 127, 0.35);
+        background: rgba(22, 196, 127, 0.12);
+        color: var(--accent);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        z-index: 1;
+      }
+      .copy-code-button:hover {
+        filter: brightness(1.06);
+      }
+      .copy-code-button.copied {
+        color: var(--text);
+        background: rgba(22, 196, 127, 0.22);
+      }
+      .breadcrumbs {
+        margin: 0 0 18px;
+        color: var(--muted-soft);
+        font-size: 0.93rem;
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        color: var(--muted-soft);
+        background: var(--surface);
+        margin-top: auto;
+        flex-shrink: 0;
+      }
+      footer .container { padding: 20px 0; }
+      @media (max-width: 720px) {
+        .container { width: min(100vw - 20px, 1080px); }
+        .navbar {
+          padding: 12px 0;
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container navbar">
+        <a class="brand" href="../../">
+          <span class="brand-mark"><img src="../../assets/caprover-green.svg" alt="" /></span>
+          <span>Sabino One-Click Apps</span>
+        </a>
+        <nav class="header-links" aria-label="Site links">
+          <a href="../">Docs</a>
+          <a href="https://github.com/sabino/oneclickapps">GitHub</a>
+          <a href="https://caprover.com/">CapRover</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+          <div class="breadcrumbs"><a href="../">Docs</a> / Increase overlay network capacity</div>
+          <article class="content">
+            <div class="content-inner">
+              <h1>Increase overlay network capacity</h1>
+<p>Busy CapRover hosts can eventually run into a shared swarm networking problem: the global <code>captain-overlay-network</code> runs out of VIP/IP allocations.</p>
+<h2>Symptoms</h2>
+<p>In the CapRover browser deployment flow, you may see:</p>
+<ul>
+<li><code>No NodeId was found. Try again in a minute...</code></li>
+</ul>
+<p>On the Docker host, <code>docker service ps ...</code> or daemon logs may show:</p>
+<ul>
+<li><code>could not find an available IP while allocating VIP</code></li>
+<li><code>service ... has pending allocations</code></li>
+</ul>
+<p>This is not tied to one specific app. It means the shared overlay network CapRover uses for service-to-service traffic does not have enough free addresses.</p>
+<h2>Why this happens</h2>
+<p>CapRover one-click apps do not expose custom Docker swarm network topology in a reliable way. Large templates therefore end up consuming addresses on the shared <code>captain-overlay-network</code>.</p>
+<p>If that network was created as a <code>/24</code>, it only has a small address pool. A sufficiently busy CapRover instance can exhaust it.</p>
+<h2>Quick relief</h2>
+<p>Before migrating the overlay network, try the simpler fixes:</p>
+<ul>
+<li>remove unused apps and services</li>
+<li>remove broken or half-deployed stacks</li>
+<li>retry the install</li>
+</ul>
+<p>If the host is still tight on overlay addresses, migrate the network.</p>
+<h2>Tested migration: <code>/24</code> to <code>/20</code></h2>
+<p>This is the exact shape that was used successfully on a single-node CapRover swarm host.</p>
+<h3>1. Inspect the current shared overlay</h3>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker network inspect captain-overlay-network
+</code></pre></div><p>If it shows a <code>/24</code> subnet and the symptoms above are present, continue.</p>
+<h3>2. Create a temporary migration network</h3>
+<p>Use a non-overlapping subnet that is not already in use on the host.</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker network create \
+  --driver overlay \
+  --attachable \
+  --subnet 10.0.32.0/20 \
+  captain-overlay-network-migrate
+</code></pre></div><h3>3. Attach every swarm service that currently uses <code>captain-overlay-network</code></h3>
+<p>This adds the temporary network first so services stay reachable during the move.</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash"><span class="hljs-keyword">for</span> svc <span class="hljs-keyword">in</span> $(docker service <span class="hljs-built_in">ls</span> --format <span class="hljs-string">&#x27;{{.Name}}&#x27;</span>); <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">if</span> docker service inspect <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span> --format <span class="hljs-string">&#x27;{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}&#x27;</span> | grep -qx <span class="hljs-string">&#x27;captain-overlay-network&#x27;</span>; <span class="hljs-keyword">then</span>
+    docker service update --network-add captain-overlay-network-migrate <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span>
+  <span class="hljs-keyword">fi</span>
+<span class="hljs-keyword">done</span>
+</code></pre></div><h3>4. Remove the old network from those services</h3>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash"><span class="hljs-keyword">for</span> svc <span class="hljs-keyword">in</span> $(docker service <span class="hljs-built_in">ls</span> --format <span class="hljs-string">&#x27;{{.Name}}&#x27;</span>); <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">if</span> docker service inspect <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span> --format <span class="hljs-string">&#x27;{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}&#x27;</span> | grep -qx <span class="hljs-string">&#x27;captain-overlay-network&#x27;</span>; <span class="hljs-keyword">then</span>
+    docker service update --network-rm captain-overlay-network <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span>
+  <span class="hljs-keyword">fi</span>
+<span class="hljs-keyword">done</span>
+</code></pre></div><h3>5. Remove and recreate <code>captain-overlay-network</code> with a larger subnet</h3>
+<p>The tested replacement was <code>10.0.16.0/20</code>.</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker network <span class="hljs-built_in">rm</span> captain-overlay-network
+
+docker network create \
+  --driver overlay \
+  --attachable \
+  --subnet 10.0.16.0/20 \
+  captain-overlay-network
+</code></pre></div><h3>6. Move services back onto the recreated shared overlay</h3>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash"><span class="hljs-keyword">for</span> svc <span class="hljs-keyword">in</span> $(docker service <span class="hljs-built_in">ls</span> --format <span class="hljs-string">&#x27;{{.Name}}&#x27;</span>); <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">if</span> docker service inspect <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span> --format <span class="hljs-string">&#x27;{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}&#x27;</span> | grep -qx <span class="hljs-string">&#x27;captain-overlay-network-migrate&#x27;</span>; <span class="hljs-keyword">then</span>
+    docker service update --network-add captain-overlay-network <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span>
+  <span class="hljs-keyword">fi</span>
+<span class="hljs-keyword">done</span>
+</code></pre></div><h3>7. Detach the temporary migration network</h3>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash"><span class="hljs-keyword">for</span> svc <span class="hljs-keyword">in</span> $(docker service <span class="hljs-built_in">ls</span> --format <span class="hljs-string">&#x27;{{.Name}}&#x27;</span>); <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">if</span> docker service inspect <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span> --format <span class="hljs-string">&#x27;{{range .Spec.TaskTemplate.Networks}}{{println .Target}}{{end}}&#x27;</span> | grep -qx <span class="hljs-string">&#x27;captain-overlay-network-migrate&#x27;</span>; <span class="hljs-keyword">then</span>
+    docker service update --network-rm captain-overlay-network-migrate <span class="hljs-string">&quot;<span class="hljs-variable">$svc</span>&quot;</span>
+  <span class="hljs-keyword">fi</span>
+<span class="hljs-keyword">done</span>
+</code></pre></div><h3>8. Remove the temporary network</h3>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker network <span class="hljs-built_in">rm</span> captain-overlay-network-migrate
+</code></pre></div><p>If Docker still shows a ghost entry for the temporary overlay even after all services have left it, a Docker daemon restart usually clears it. Do that only after verifying no service still depends on it.</p>
+<h2>Verification</h2>
+<p>Check the recreated network:</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker network inspect captain-overlay-network --format <span class="hljs-string">&#x27;{{json .IPAM.Config}}&#x27;</span>
+</code></pre></div><p>The working state should show:</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;Subnet&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;10.0.16.0/20&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;Gateway&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;10.0.16.1&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
+</code></pre></div><p>Then verify the core CapRover services are healthy again:</p>
+<div class="code-block"><button class="copy-code-button" type="button" data-copy-code>Copy</button><pre><code class="hljs language-bash">docker service <span class="hljs-built_in">ls</span> --format <span class="hljs-string">&#x27;{{.Name}} {{.Replicas}}&#x27;</span> | grep <span class="hljs-string">&#x27;captain-&#x27;</span>
+</code></pre></div><p>And finally retry the deployment that was failing.</p>
+
+            </div>
+          </article>
+        </main>
+    <footer>
+      <div class="container">Built for CapRover third-party repositories.</div>
+    </footer>
+    <script>
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+
+        const input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        input.style.pointerEvents = 'none';
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+        const copied = document.execCommand('copy');
+        document.body.removeChild(input);
+        return copied;
+      }
+
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy-code]');
+        if (!button) {
+          return;
+        }
+
+        const pre = button.parentElement.querySelector('pre');
+        if (!pre) {
+          return;
+        }
+
+        const originalText = button.textContent;
+        try {
+          await copyText(pre.innerText.replace(/\n$/, ''));
+          button.textContent = 'Copied';
+          button.classList.add('copied');
+        } catch (error) {
+          console.error(error);
+          button.textContent = 'Copy failed';
+        }
+
+        window.setTimeout(() => {
+          button.textContent = originalText;
+          button.classList.remove('copied');
+        }, 1800);
+      });
+    </script>
+  </body>
+</html>
