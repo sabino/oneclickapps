@@ -240,14 +240,9 @@ const studioDockerfileLines = renderDockerfileTemplate("studio.Dockerfile", {
     readAsset("common/legacy-keys.sh"),
     true,
   ),
-  __WRITE_STUDIO_AI_PATCH__: writeFileInstruction(
-    "/usr/local/bin/patch-studio-ai.sh",
-    readAsset("studio/patch-studio-ai.sh"),
-    true,
-  ),
   __WRITE_DOCKER_ENTRYPOINT_WRAPPER__: writeFileInstruction(
-    "/usr/local/bin/with-legacy-keys-and-ai-patch-docker-entrypoint.sh",
-    readAsset("studio/with-legacy-keys-and-ai-patch-docker-entrypoint.sh"),
+    "/usr/local/bin/with-legacy-keys-docker-entrypoint.sh",
+    readAsset("common/with-legacy-keys-docker-entrypoint.sh"),
     true,
   ),
 });
