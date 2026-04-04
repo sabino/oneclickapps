@@ -372,6 +372,35 @@ services:
       #      - ::1
       #    deny: []
 
+  ## Self-hosted platform control plane
+  - name: platform-api
+    _comment: 'Platform API: /api/platform/* -> http://srv-captain--supabase-platform-api:8080/api/platform/*'
+    url: http://srv-captain--supabase-platform-api:8080/api/platform/
+    routes:
+      - name: platform-api-all
+        strip_path: true
+        paths:
+          - /api/platform/
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true
+
+  - name: platform-api-v1
+    _comment: 'Platform API: /api/v1/* -> http://srv-captain--supabase-platform-api:8080/api/v1/*'
+    url: http://srv-captain--supabase-platform-api:8080/api/v1/
+    routes:
+      - name: platform-api-v1-all
+        strip_path: true
+        paths:
+          - /api/v1/
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true
+
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'

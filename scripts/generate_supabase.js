@@ -390,6 +390,8 @@ const allServices = {
       AUTH_JWT_SECRET: "$$cap_jwt_secret",
       SNIPPETS_MANAGEMENT_FOLDER: "/app/snippets",
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: "/app/edge-functions",
+      NEXT_PUBLIC_IS_PLATFORM: "true",
+      SUPABASE_FORCE_PLATFORM_LOGGED_IN: "true",
       NEXT_PUBLIC_ENABLE_LOGS: "false",
       LOGFLARE_URL: "http://srv-captain--$$cap_appname-analytics:4000",
       LOGFLARE_PRIVATE_ACCESS_TOKEN: "$$cap_logflare_private_access_token",

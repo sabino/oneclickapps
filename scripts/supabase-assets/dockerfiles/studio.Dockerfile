@@ -3,5 +3,6 @@ __INSTALL_OPENSSL__
 __WRITE_LEGACY_KEYS_LIB__
 __WRITE_STUDIO_AI_PATCH__
 __WRITE_DOCKER_ENTRYPOINT_WRAPPER__
+RUN /usr/local/bin/patch-studio-ai.sh
 ENTRYPOINT ["/bin/sh", "/usr/local/bin/with-legacy-keys-and-ai-patch-docker-entrypoint.sh"]
 CMD ["node", "apps/studio/server.js"]
