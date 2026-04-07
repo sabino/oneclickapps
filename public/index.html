@@ -629,6 +629,10 @@
             <span class="meta-label">Public service</span>
             <span class="meta-value public-service-value"></span>
           </div>
+          <div class="meta">
+            <span class="meta-label">Version</span>
+            <span class="meta-value version-value"></span>
+          </div>
         </div>
 
         <div class="tags"></div>
@@ -849,7 +853,7 @@
         const category = els.category.value;
 
         state.filteredApps = state.apps.filter((app) => {
-          const haystack = [app.name, app.displayName, app.description, app.category, ...(app.tags || [])]
+          const haystack = [app.name, app.displayName, app.description, app.category, app.versionSummary, ...(app.tags || [])]
             .filter(Boolean)
             .join(' ')
             .toLowerCase();
@@ -867,6 +871,37 @@
         tag.className = 'tag';
         tag.textContent = label;
         return tag;
+      }
+
+      function deriveVersionSummary(variables) {
+        const versionVariables = (variables || [])
+          .filter((variable) => {
+            const id = `${variable.id || ''}`.toLowerCase();
+            const label = `${variable.label || ''}`.toLowerCase();
+            return id.includes('version') || label.includes('version');
+          })
+          .map((variable) => ({
+            label: `${variable.label || variable.id || ''}`
+              .replace(/\s+version$/i, '')
+              .replace(/\s+image tag$/i, '')
+              .trim(),
+            value: `${variable.defaultValue || ''}`.trim(),
+          }))
+          .filter((variable) => variable.value);
+
+        if (!versionVariables.length) {
+          return '';
+        }
+
+        const parts = versionVariables.map((variable) =>
+          variable.label ? `${variable.label} ${variable.value}` : variable.value
+        );
+
+        if (parts.length <= 2) {
+          return parts.join(' · ');
+        }
+
+        return `${parts[0]} · ${parts[1]} +${parts.length - 2} more`;
       }
 
       function renderApps() {
@@ -895,6 +930,7 @@
           root.querySelector('.category-value').textContent = app.category || 'Uncategorized';
           root.querySelector('.variables-value').textContent = String(app.variableCount ?? '—');
           root.querySelector('.public-service-value').textContent = app.publicService || '—';
+          root.querySelector('.version-value').textContent = app.versionSummary || '—';
           const officialLink = root.querySelector('.official-link');
           const guideLink = root.querySelector('.guide-link');
           officialLink.href = app.documentation || app.templateUrl;
@@ -959,6 +995,7 @@
                 serviceCount: Object.keys(services).length,
                 variableCount: variables.length,
                 publicService: publicService ? publicService.replace('$$cap_appname', summary.name) : '',
+                versionSummary: deriveVersionSummary(variables),
               };
             })
           );
