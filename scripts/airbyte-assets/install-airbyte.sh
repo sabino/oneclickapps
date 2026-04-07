@@ -5,17 +5,33 @@ AIRBYTE_MANAGER_HOME="${AIRBYTE_MANAGER_HOME:-/var/lib/airbyte-manager}"
 AIRBYTE_RUNTIME_DIR="${AIRBYTE_RUNTIME_DIR:-$AIRBYTE_MANAGER_HOME/runtime}"
 AIRBYTE_LOG_DIR="${AIRBYTE_LOG_DIR:-$AIRBYTE_MANAGER_HOME/logs}"
 STATUS_FILE="${AIRBYTE_RUNTIME_DIR}/status.json"
+UPSTREAM_PORT_FILE="${AIRBYTE_RUNTIME_DIR}/upstream-port"
 LOCK_DIR="${AIRBYTE_RUNTIME_DIR}/install.lock"
 HOST_GATEWAY="${AIRBYTE_HOST_GATEWAY:-$(ip route | awk '/default/ { print $3; exit }')}"
 RUNNER_NAME="${AIRBYTE_RUNNER_NAME:-airbyte-manager-runner}"
+NGINX_TEMPLATE_FILE="${AIRBYTE_NGINX_TEMPLATE_FILE:-/opt/airbyte-manager/nginx.conf.template}"
+NGINX_CONFIG_FILE="${AIRBYTE_NGINX_CONFIG_FILE:-/etc/nginx/nginx.conf}"
 
 mkdir -p "$AIRBYTE_RUNTIME_DIR" "$AIRBYTE_LOG_DIR" "$AIRBYTE_MANAGER_HOME"
+
+current_target_port() {
+  if [ -s "$UPSTREAM_PORT_FILE" ]; then
+    port="$(tr -cd '0-9' < "$UPSTREAM_PORT_FILE")"
+    if [ -n "$port" ]; then
+      printf '%s\n' "$port"
+      return 0
+    fi
+  fi
+
+  printf '%s\n' "$AIRBYTE_HOST_PORT"
+}
 
 write_status() {
   state="$1"
   message="$2"
+  target_port="$(current_target_port)"
   cat >"${STATUS_FILE}.tmp" <<EOF
-{"state":"${state}","message":"${message}","mode":"${AIRBYTE_MANAGER_MODE:-install}","updatedAt":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","target":"http://${HOST_GATEWAY}:${AIRBYTE_HOST_PORT}"}
+{"state":"${state}","message":"${message}","mode":"${AIRBYTE_MANAGER_MODE:-install}","updatedAt":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","target":"http://${HOST_GATEWAY}:${target_port}"}
 EOF
   mv "${STATUS_FILE}.tmp" "$STATUS_FILE"
 }
@@ -54,6 +70,26 @@ detect_manager_mount() {
 
 detect_runner_image() {
   docker inspect "$HOSTNAME" --format '{{.Config.Image}}'
+}
+
+reload_proxy_target() {
+  target_port="$(current_target_port)"
+
+  if [ -z "$target_port" ] || [ "$target_port" = "$AIRBYTE_HOST_PORT" ]; then
+    return 0
+  fi
+
+  if [ ! -f "$NGINX_TEMPLATE_FILE" ]; then
+    return 0
+  fi
+
+  AIRBYTE_PROXY_UPSTREAM="http://${HOST_GATEWAY}:${target_port}" \
+  AIRBYTE_PROXY_UPSTREAM_HOSTPORT="${HOST_GATEWAY}:${target_port}" \
+    envsubst '${AIRBYTE_PROXY_UPSTREAM} ${AIRBYTE_PROXY_UPSTREAM_HOSTPORT}' \
+      <"$NGINX_TEMPLATE_FILE" \
+      >"$NGINX_CONFIG_FILE"
+
+  nginx -s reload >/dev/null 2>&1 || true
 }
 
 run_host_runner() {
@@ -127,6 +163,8 @@ main() {
     write_status "error" "Airbyte host runner failed. Check the manager logs."
     exit 1
   }
+
+  reload_proxy_target
 }
 
 main "$@"

@@ -5,6 +5,7 @@ AIRBYTE_MANAGER_HOME="${AIRBYTE_MANAGER_HOME:-/var/lib/airbyte-manager}"
 AIRBYTE_RUNTIME_DIR="${AIRBYTE_RUNTIME_DIR:-$AIRBYTE_MANAGER_HOME/runtime}"
 AIRBYTE_LOG_DIR="${AIRBYTE_LOG_DIR:-$AIRBYTE_MANAGER_HOME/logs}"
 STATUS_FILE="${AIRBYTE_RUNTIME_DIR}/status.json"
+UPSTREAM_PORT_FILE="${AIRBYTE_RUNTIME_DIR}/upstream-port"
 TARGET_HOST="${AIRBYTE_TARGET_HOST:-127.0.0.1}"
 AIRBYTE_VALUES_FILE="${AIRBYTE_VALUES_FILE:-/opt/airbyte-manager/airbyte-values.yaml}"
 
@@ -17,13 +18,30 @@ export DO_NOT_TRACK=1
 AIRBYTE_CLUSTER_NAME="${AIRBYTE_CLUSTER_NAME:-airbyte-abctl}"
 AIRBYTE_KUBECONFIG_PATH="${AIRBYTE_KUBECONFIG_PATH:-$AIRBYTE_MANAGER_HOME/.airbyte/abctl/abctl.kubeconfig}"
 
+current_target_port() {
+  if [ -s "$UPSTREAM_PORT_FILE" ]; then
+    port="$(tr -cd '0-9' < "$UPSTREAM_PORT_FILE")"
+    if [ -n "$port" ]; then
+      printf '%s\n' "$port"
+      return 0
+    fi
+  fi
+
+  printf '%s\n' "$AIRBYTE_HOST_PORT"
+}
+
 write_status() {
   state="$1"
   message="$2"
+  target_port="$(current_target_port)"
   cat >"${STATUS_FILE}.tmp" <<EOF
-{"state":"${state}","message":"${message}","mode":"${AIRBYTE_MANAGER_MODE:-install}","updatedAt":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","target":"http://${TARGET_HOST}:${AIRBYTE_HOST_PORT}"}
+{"state":"${state}","message":"${message}","mode":"${AIRBYTE_MANAGER_MODE:-install}","updatedAt":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","target":"http://${TARGET_HOST}:${target_port}"}
 EOF
   mv "${STATUS_FILE}.tmp" "$STATUS_FILE"
+}
+
+extract_accessible_port() {
+  printf '%s\n' "$1" | sed -n 's/.*http:\/\/localhost:\([0-9][0-9]*\).*/\1/p' | head -n1
 }
 
 local_install_exists() {
@@ -62,18 +80,31 @@ ensure_single_install_supported() {
   fi
 }
 
-wait_for_ingress() {
-  attempt=0
-  while [ "$attempt" -lt 60 ]; do
-    if curl -fsS -I \
-      -H "Host: $AIRBYTE_DOMAIN" \
-      "http://127.0.0.1:${AIRBYTE_HOST_PORT}/" >/dev/null 2>&1; then
-      return 0
-    fi
-    attempt=$((attempt + 1))
-    sleep 2
-  done
-  return 1
+probe_existing_install() {
+  status_output="$(abctl local status --verbose 2>&1 || true)"
+  existing_port="$(extract_accessible_port "$status_output")"
+
+  if [ -z "$existing_port" ]; then
+    return 1
+  fi
+
+  printf '%s\n' "$existing_port" > "$UPSTREAM_PORT_FILE"
+
+  if ! curl -fsS --max-time 5 "http://127.0.0.1:${existing_port}/" >/dev/null 2>&1; then
+    return 1
+  fi
+
+  if printf '%s\n' "$status_output" | grep -q "Status: failed"; then
+    write_status \
+      "warning" \
+      "Airbyte is reachable on the existing ingress port ${existing_port}, but abctl still reports the Helm release as failed. Reusing the current install instead of forcing a reinstall."
+  else
+    write_status \
+      "ready" \
+      "Airbyte is already installed and reachable on the existing ingress port ${existing_port}."
+  fi
+
+  return 0
 }
 
 build_install_args() {
@@ -133,6 +164,10 @@ main() {
       ;;
   esac
 
+  if probe_existing_install; then
+    exit 0
+  fi
+
   write_status "installing" "Bootstrapping Airbyte with abctl on the host Docker daemon. This can take several minutes on the first run."
 
   ensure_single_install_supported || exit 1
@@ -142,8 +177,7 @@ main() {
     exit 1
   }
 
-  if abctl local status >/dev/null 2>&1 && wait_for_ingress; then
-    write_status "ready" "Airbyte is installed and the manager proxy is routing traffic to the host ingress."
+  if probe_existing_install; then
     exit 0
   fi
 
