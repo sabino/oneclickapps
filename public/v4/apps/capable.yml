@@ -40,22 +40,46 @@ services:
                 - 'ARG CLAUDE_CODE_VERSION=$$cap_claude_code_version'
                 - 'ARG CODEX_CLI_VERSION=$$cap_codex_cli_version'
                 - 'ARG QWEN_CODE_VERSION=$$cap_qwen_code_version'
-                - 'ENV NEXT_TELEMETRY_DISABLED=1 CI=1 NEXT_PUBLIC_REALTIME_TRANSPORT=sse'
+                - 'ENV NEXT_TELEMETRY_DISABLED=1 CI=1 NEXT_PUBLIC_REALTIME_TRANSPORT=sse NEXT_PUBLIC_PREVIEW_RUNTIME=caprover NEXT_PUBLIC_PREVIEW_STOP_ON_UNLOAD=false PUPPETEER_SKIP_DOWNLOAD=true PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium CHROME_BIN=/usr/bin/chromium'
                 - |-
                     RUN apt-get update && \
                         apt-get install -y --no-install-recommends \
                           bash \
+                          build-essential \
                           ca-certificates \
+                          chromium \
                           curl \
+                          dnsutils \
+                          fd-find \
+                          file \
                           git \
+                          git-lfs \
                           gosu \
+                          iputils-ping \
+                          jq \
+                          less \
+                          lsof \
                           make \
+                          nano \
+                          netcat-openbsd \
                           openssh-client \
+                          pkg-config \
                           procps \
                           python3 \
-                          g++ && \
+                          python3-pip \
+                          python3-venv \
+                          ripgrep \
+                          rsync \
+                          sqlite3 \
+                          tar \
+                          tree \
+                          unzip \
+                          vim-tiny \
+                          xz-utils \
+                          zip && \
+                        ln -sf /usr/bin/fdfind /usr/local/bin/fd && \
                         rm -rf /var/lib/apt/lists/*
-                - 'RUN corepack enable'
+                - 'RUN corepack enable && corepack prepare pnpm@10.23.0 --activate && corepack prepare yarn@4.12.0 --activate'
                 - 'WORKDIR /opt/capable'
                 - |-
                     RUN git init . && \
