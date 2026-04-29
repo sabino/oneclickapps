@@ -11,6 +11,7 @@ This repo is intended to be added alongside the official CapRover one-click app 
 
 ## What is included
 - one canonical full-stack `supabase.yml` template
+- `claudable.yml` and `capable.yml` developer-tool templates
 - a generator at `scripts/generate_supabase.js`
 - vendored assets under `scripts/supabase-assets/`
 - a generated standalone template at `public/v4/apps/supabase.yml`

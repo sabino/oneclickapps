@@ -16,5 +16,31 @@
         "category": "Data Integration",
         "tags": ["airbyte", "elt", "kind", "helm", "docker-socket", "manager"],
         "documentation": "https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart"
+    },
+    "claudable": {
+        "category": "Developer Tools",
+        "tags": [
+            "claudable",
+            "ai",
+            "nextjs",
+            "claude-code",
+            "codex",
+            "qwen",
+            "sqlite"
+        ],
+        "documentation": "https://github.com/opactorai/Claudable"
+    },
+    "capable": {
+        "category": "Developer Tools",
+        "tags": [
+            "capable",
+            "caprover",
+            "ai",
+            "nextjs",
+            "codex",
+            "claude-code",
+            "sqlite"
+        ],
+        "documentation": "https://github.com/yourusername/capable"
     }
 }

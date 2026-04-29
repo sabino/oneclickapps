@@ -1,0 +1,139 @@
+captainVersion: 4
+services:
+    $$cap_appname:
+        restart: 'unless-stopped'
+        volumes:
+            - '$$cap_appname-data:/data'
+        environment:
+            NODE_ENV: 'production'
+            PORT: '3000'
+            HOSTNAME: '0.0.0.0'
+            HOME: '/data/home'
+            DATABASE_URL: 'file:/data/capable.db'
+            PROJECTS_DIR: '/data/projects'
+            SETTINGS_DIR: '/data'
+            PUBLIC_BASE_URL: 'https://$$cap_appname.$$cap_root_domain'
+            NEXT_PUBLIC_APP_URL: 'https://$$cap_appname.$$cap_root_domain'
+            CAPABLE_MODE: 'caprover'
+            ENCRYPTION_KEY: '$$cap_encryption_key'
+            NPM_GLOBAL_PATH: '/usr/local/bin'
+            NPM_CONFIG_CACHE: '/data/npm-cache'
+            NEXT_TELEMETRY_DISABLED: '1'
+            CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1'
+            CAPROVER_DEFAULT_URL: '$$cap_default_captain_url'
+            CAPROVER_DEFAULT_ROOT_DOMAIN: '$$cap_root_domain'
+            ANTHROPIC_API_KEY: '$$cap_anthropic_api_key'
+            OPENAI_API_KEY: '$$cap_openai_api_key'
+            QWEN_API_KEY: '$$cap_qwen_api_key'
+            ZHIPU_API_KEY: '$$cap_zhipu_api_key'
+            GITHUB_TOKEN: '$$cap_github_token'
+        caproverExtra:
+            containerHttpPort: '3000'
+            websocketSupport: 'true'
+            dockerfileLines:
+                - 'FROM node:22-bookworm-slim'
+                - 'ARG CAPABLE_REPO=$$cap_capable_repo'
+                - 'ARG CAPABLE_REF=$$cap_capable_ref'
+                - 'ARG CLAUDE_CODE_VERSION=$$cap_claude_code_version'
+                - 'ARG CODEX_CLI_VERSION=$$cap_codex_cli_version'
+                - 'ARG QWEN_CODE_VERSION=$$cap_qwen_code_version'
+                - 'ENV NEXT_TELEMETRY_DISABLED=1 CI=1'
+                - |-
+                    RUN apt-get update && \
+                        apt-get install -y --no-install-recommends \
+                          bash \
+                          ca-certificates \
+                          curl \
+                          git \
+                          gosu \
+                          make \
+                          openssh-client \
+                          procps \
+                          python3 \
+                          g++ && \
+                        rm -rf /var/lib/apt/lists/*
+                - 'RUN corepack enable'
+                - 'WORKDIR /opt/capable'
+                - |-
+                    RUN git init . && \
+                        git remote add origin "$CAPABLE_REPO" && \
+                        git fetch --depth 1 origin "$CAPABLE_REF" && \
+                        git checkout --detach FETCH_HEAD
+                - 'RUN npm ci'
+                - 'RUN npm run build'
+                - 'RUN cp -r public .next/standalone/ && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static'
+                - |-
+                    RUN npm install -g \
+                          "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
+                          "@openai/codex@${CODEX_CLI_VERSION}" \
+                          "@qwen-code/qwen-code@${QWEN_CODE_VERSION}" && \
+                        npm cache clean --force
+                - 'RUN useradd --create-home --home-dir /data/home --shell /bin/bash capable'
+                - |-
+                    RUN mkdir -p /usr/local/bin && \
+                        printf '%b' '#!/bin/sh\nset -eu\n\nif [ "$(id -u)" = "0" ]; then\n  mkdir -p /data/projects /data/uploads /data/home /data/npm-cache /data/tmp\n  rm -rf /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  ln -s /data /opt/capable/data\n  ln -s /data/uploads /opt/capable/public/uploads\n  ln -s /data /opt/capable/.next/standalone/data\n  ln -s /data/uploads /opt/capable/.next/standalone/public/uploads\n  mkdir -p /opt/capable/.next/standalone/.next/cache/images\n  chown -R capable:capable /data /opt/capable/.next/standalone/.next/cache\n  chown -h capable:capable /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  exec gosu capable /usr/local/bin/capable-entrypoint.sh "$@"\nfi\n\nexport NODE_ENV="${NODE_ENV:-production}"\nexport PORT="${PORT:-3000}"\nexport HOSTNAME="${HOSTNAME:-0.0.0.0}"\nexport HOME="${HOME:-/data/home}"\nexport DATABASE_URL="${DATABASE_URL:-file:/data/capable.db}"\nexport PROJECTS_DIR="${PROJECTS_DIR:-/data/projects}"\nexport SETTINGS_DIR="${SETTINGS_DIR:-/data}"\nexport NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-/data/npm-cache}"\nexport TMPDIR="${TMPDIR:-/data/tmp}"\nexport NEXT_TELEMETRY_DISABLED="${NEXT_TELEMETRY_DISABLED:-1}"\nexport CAPABLE_MODE="${CAPABLE_MODE:-caprover}"\n\nmkdir -p "$PROJECTS_DIR" "$SETTINGS_DIR" "$HOME" "$NPM_CONFIG_CACHE" "$TMPDIR"\ncd /opt/capable\n\nnpx prisma db push --skip-generate\ncd /opt/capable/.next/standalone\nexec node server.js\n' > /usr/local/bin/capable-entrypoint.sh && \
+                        chmod +x /usr/local/bin/capable-entrypoint.sh
+                - 'ENTRYPOINT ["/bin/sh", "/usr/local/bin/capable-entrypoint.sh"]'
+caproverOneClickApp:
+    variables:
+        - id: '$$cap_capable_repo'
+          label: 'CapAble git repository'
+          defaultValue: 'https://github.com/yourusername/capable.git'
+          description: 'Git URL for the CapAble fork. Replace this with the published fork URL before deploying.'
+          validRegex: '/^https:\/\/.+\.git$/'
+        - id: '$$cap_capable_ref'
+          label: 'CapAble git ref'
+          defaultValue: 'main'
+          description: 'Branch, tag, or commit to build.'
+          validRegex: '/^[A-Za-z0-9._\/-]+$/'
+        - id: '$$cap_claude_code_version'
+          label: 'Claude Code CLI version'
+          defaultValue: '2.1.123'
+          description: 'Pinned @anthropic-ai/claude-code package version installed in the app image.'
+          validRegex: "/^([^\\s^\\/])+$/"
+        - id: '$$cap_codex_cli_version'
+          label: 'Codex CLI version'
+          defaultValue: '0.125.0'
+          description: 'Pinned @openai/codex package version installed in the app image.'
+          validRegex: "/^([^\\s^\\/])+$/"
+        - id: '$$cap_qwen_code_version'
+          label: 'Qwen Code CLI version'
+          defaultValue: '0.15.5'
+          description: 'Pinned @qwen-code/qwen-code package version installed in the app image.'
+          validRegex: "/^([^\\s^\\/])+$/"
+        - id: '$$cap_encryption_key'
+          label: 'Encryption key'
+          defaultValue: '$$cap_gen_random_hex(64)'
+          description: 'Persistent 64-character hex key used to encrypt saved service tokens and project environment variables.'
+          validRegex: '/^[a-fA-F0-9]{64}$/'
+        - id: '$$cap_default_captain_url'
+          label: 'Default Captain URL'
+          defaultValue: 'https://captain.$$cap_root_domain'
+          description: 'Optional default shown in CapAble settings. You still connect the fleet inside the app.'
+        - id: '$$cap_anthropic_api_key'
+          label: 'Anthropic API key'
+          defaultValue: ''
+          description: 'Optional. Used by Claude Code when token-based login is not configured.'
+        - id: '$$cap_openai_api_key'
+          label: 'OpenAI API key'
+          defaultValue: ''
+          description: 'Optional. Used by Codex CLI when token-based login is not configured.'
+        - id: '$$cap_qwen_api_key'
+          label: 'Qwen API key'
+          defaultValue: ''
+          description: 'Optional. Used by Qwen Code when configured for API-key auth.'
+        - id: '$$cap_zhipu_api_key'
+          label: 'Zhipu API key'
+          defaultValue: ''
+          description: 'Optional. Used by GLM mode.'
+        - id: '$$cap_github_token'
+          label: 'GitHub token'
+          defaultValue: ''
+          description: 'Optional. Used for source-control integration.'
+    instructions:
+        start: "CapAble will be built from the configured fork git repository and deployed as one CapRover web app.\n\nThe app stores SQLite data, generated projects, uploads, npm cache, and CLI login state under the persistent /data volume. CapAble is designed for single-tenant self-hosted use."
+        end: "CapAble has been deployed.\n\nNext steps:\n1. Enable HTTPS for $$cap_appname in CapRover.\n2. Open https://$$cap_appname.$$cap_root_domain\n3. Open Settings > Services and connect your CapRover fleet.\n4. Add AI provider keys or exec into the container and authenticate the relevant CLI with HOME=/data/home.\n\nGenerated project previews and production publishes use CapRover apps instead of localhost preview URLs."
+    displayName: 'CapAble'
+    isOfficial: false
+    description: 'Self-hosted AI app builder that deploys generated Next.js apps directly to a CapRover fleet.'
+    documentation: 'https://github.com/yourusername/capable'
