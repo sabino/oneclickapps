@@ -78,7 +78,7 @@ caproverOneClickApp:
     variables:
         - id: '$$cap_capable_repo'
           label: 'CapAble git repository'
-          defaultValue: 'https://github.com/yourusername/capable.git'
+          defaultValue: 'https://github.com/sabino-software/capable.git'
           description: 'Git URL for the CapAble fork. Replace this with the published fork URL before deploying.'
           validRegex: '/^https:\/\/.+\.git$/'
         - id: '$$cap_capable_ref'
@@ -136,4 +136,4 @@ caproverOneClickApp:
     displayName: 'CapAble'
     isOfficial: false
     description: 'Self-hosted AI app builder that deploys generated Next.js apps directly to a CapRover fleet.'
-    documentation: 'https://github.com/yourusername/capable'
+    documentation: 'https://github.com/sabino-software/capable'
