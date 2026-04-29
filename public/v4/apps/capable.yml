@@ -20,8 +20,10 @@ services:
             NPM_CONFIG_CACHE: '/data/npm-cache'
             NEXT_TELEMETRY_DISABLED: '1'
             CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1'
+            CAPROVER_INTERNAL_URL: 'http://captain-captain:3000'
             CAPROVER_DEFAULT_URL: '$$cap_default_captain_url'
             CAPROVER_DEFAULT_ROOT_DOMAIN: '$$cap_root_domain'
+            CAPROVER_AUTH_TOKEN: '$$cap_captain_auth_token'
             ANTHROPIC_API_KEY: '$$cap_anthropic_api_key'
             OPENAI_API_KEY: '$$cap_openai_api_key'
             QWEN_API_KEY: '$$cap_qwen_api_key'
@@ -71,7 +73,7 @@ services:
                 - 'RUN useradd --create-home --home-dir /data/home --shell /bin/bash capable'
                 - |-
                     RUN mkdir -p /usr/local/bin && \
-                        printf '%b' '#!/bin/sh\nset -eu\n\nif [ "$(id -u)" = "0" ]; then\n  mkdir -p /data/projects /data/uploads /data/home /data/npm-cache /data/tmp\n  rm -rf /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  ln -s /data /opt/capable/data\n  ln -s /data/uploads /opt/capable/public/uploads\n  ln -s /data /opt/capable/.next/standalone/data\n  ln -s /data/uploads /opt/capable/.next/standalone/public/uploads\n  mkdir -p /opt/capable/.next/standalone/.next/cache/images\n  chown -R capable:capable /data /opt/capable/.next/standalone/.next/cache\n  chown -h capable:capable /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  exec gosu capable /usr/local/bin/capable-entrypoint.sh "$@"\nfi\n\nexport NODE_ENV="${NODE_ENV:-production}"\nexport PORT="${PORT:-3000}"\nexport HOSTNAME="${HOSTNAME:-0.0.0.0}"\nexport HOME="${HOME:-/data/home}"\nexport DATABASE_URL="${DATABASE_URL:-file:/data/capable.db}"\nexport PROJECTS_DIR="${PROJECTS_DIR:-/data/projects}"\nexport SETTINGS_DIR="${SETTINGS_DIR:-/data}"\nexport NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-/data/npm-cache}"\nexport TMPDIR="${TMPDIR:-/data/tmp}"\nexport NEXT_TELEMETRY_DISABLED="${NEXT_TELEMETRY_DISABLED:-1}"\nexport CAPABLE_MODE="${CAPABLE_MODE:-caprover}"\n\nmkdir -p "$PROJECTS_DIR" "$SETTINGS_DIR" "$HOME" "$NPM_CONFIG_CACHE" "$TMPDIR"\ncd /opt/capable\n\nnpx prisma db push --skip-generate\ncd /opt/capable/.next/standalone\nexec node server.js\n' > /usr/local/bin/capable-entrypoint.sh && \
+                        printf '%b' '#!/bin/sh\nset -eu\n\nif [ "$(id -u)" = "0" ]; then\n  mkdir -p /data/projects /data/uploads /data/home /data/npm-cache /data/tmp\n  rm -rf /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  ln -s /data /opt/capable/data\n  ln -s /data/uploads /opt/capable/public/uploads\n  ln -s /data /opt/capable/.next/standalone/data\n  ln -s /data/uploads /opt/capable/.next/standalone/public/uploads\n  mkdir -p /opt/capable/.next/standalone/.next/cache/images\n  chown -R capable:capable /data /opt/capable/.next/standalone/.next/cache\n  chown -h capable:capable /opt/capable/data /opt/capable/public/uploads /opt/capable/.next/standalone/data /opt/capable/.next/standalone/public/uploads\n  exec gosu capable /usr/local/bin/capable-entrypoint.sh "$@"\nfi\n\nexport NODE_ENV="${NODE_ENV:-production}"\nexport PORT="${PORT:-3000}"\nexport HOSTNAME="${HOSTNAME:-0.0.0.0}"\nexport HOME="${HOME:-/data/home}"\nexport DATABASE_URL="${DATABASE_URL:-file:/data/capable.db}"\nexport PROJECTS_DIR="${PROJECTS_DIR:-/data/projects}"\nexport SETTINGS_DIR="${SETTINGS_DIR:-/data}"\nexport NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-/data/npm-cache}"\nexport TMPDIR="${TMPDIR:-/data/tmp}"\nexport NEXT_TELEMETRY_DISABLED="${NEXT_TELEMETRY_DISABLED:-1}"\nexport CAPABLE_MODE="${CAPABLE_MODE:-caprover}"\nexport CAPROVER_INTERNAL_URL="${CAPROVER_INTERNAL_URL:-http://captain-captain:3000}"\n\nmkdir -p "$PROJECTS_DIR" "$SETTINGS_DIR" "$HOME" "$NPM_CONFIG_CACHE" "$TMPDIR"\ncd /opt/capable\n\nnpx prisma db push --skip-generate\ncd /opt/capable/.next/standalone\nexec node server.js\n' > /usr/local/bin/capable-entrypoint.sh && \
                         chmod +x /usr/local/bin/capable-entrypoint.sh
                 - 'ENTRYPOINT ["/bin/sh", "/usr/local/bin/capable-entrypoint.sh"]'
 caproverOneClickApp:
@@ -109,7 +111,11 @@ caproverOneClickApp:
         - id: '$$cap_default_captain_url'
           label: 'Default Captain URL'
           defaultValue: 'https://captain.$$cap_root_domain'
-          description: 'Optional default shown in CapAble settings. You still connect the fleet inside the app.'
+          description: 'Public Captain URL fallback for external installs. Inside CapRover, CapAble uses the internal Captain service automatically.'
+        - id: '$$cap_captain_auth_token'
+          label: 'Captain auth token'
+          defaultValue: ''
+          description: 'Optional but recommended. If provided, CapAble can publish through the internal Captain API immediately. You can also add Captain auth later in Settings.'
         - id: '$$cap_anthropic_api_key'
           label: 'Anthropic API key'
           defaultValue: ''
@@ -132,7 +138,7 @@ caproverOneClickApp:
           description: 'Optional. Used for source-control integration.'
     instructions:
         start: "CapAble will be built from the configured fork git repository and deployed as one CapRover web app.\n\nThe app stores SQLite data, generated projects, uploads, npm cache, and CLI login state under the persistent /data volume. CapAble is designed for single-tenant self-hosted use."
-        end: "CapAble has been deployed.\n\nNext steps:\n1. Enable HTTPS for $$cap_appname in CapRover.\n2. Open https://$$cap_appname.$$cap_root_domain\n3. Open Settings > Services and connect your CapRover fleet.\n4. Add AI provider keys or exec into the container and authenticate the relevant CLI with HOME=/data/home.\n\nGenerated project previews and production publishes use CapRover apps instead of localhost preview URLs."
+        end: "CapAble has been deployed.\n\nNext steps:\n1. Enable HTTPS for $$cap_appname in CapRover.\n2. Open https://$$cap_appname.$$cap_root_domain\n3. If you did not provide a Captain auth token, open Settings > Services and add only Captain authentication. The internal CapRover fleet URL is detected automatically.\n4. Add AI provider keys or exec into the container and authenticate the relevant CLI with HOME=/data/home.\n\nGenerated project previews and production publishes use CapRover apps instead of localhost preview URLs."
     displayName: 'CapAble'
     isOfficial: false
     description: 'Self-hosted AI app builder that deploys generated Next.js apps directly to a CapRover fleet.'
